@@ -144,7 +144,41 @@
                 </div>
 
                 <!-- Content sections will be loaded here -->
-                <div id="dashboard-content"></div>
+                <div id="dashboard-content">
+                    <!-- Crops Table -->
+                    <div id="crops-section" class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Crop Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crop-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Crop rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Livestock Table -->
+                    <div id="livestock-section" class="bg-white shadow overflow-hidden sm:rounded-lg mt-6" style="display: none;">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="livestock-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Livestock rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -256,16 +290,38 @@
             }
         }
 
+        // Tab switching function
+        function switchTab(tabName) {
+            // Update tab styles
+            document.getElementById('crops-tab').classList.remove('border-green-500', 'text-green-600');
+            document.getElementById('crops-tab').classList.add('border-transparent', 'text-gray-500');
+            document.getElementById('livestock-tab').classList.remove('border-green-500', 'text-green-600');
+            document.getElementById('livestock-tab').classList.add('border-transparent', 'text-gray-500');
+
+            // Show selected tab
+            if (tabName === 'crops') {
+                document.getElementById('crops-tab').classList.remove('border-transparent', 'text-gray-500');
+                document.getElementById('crops-tab').classList.add('border-green-500', 'text-green-600');
+                document.getElementById('crops-section').style.display = 'block';
+                document.getElementById('livestock-section').style.display = 'none';
+            } else {
+                document.getElementById('livestock-tab').classList.remove('border-transparent', 'text-gray-500');
+                document.getElementById('livestock-tab').classList.add('border-green-500', 'text-green-600');
+                document.getElementById('crops-section').style.display = 'none';
+                document.getElementById('livestock-section').style.display = 'block';
+            }
+        }
+
         // Dashboard Functions
         function initializeDashboard() {
             // Mock Data
-            let mockCrops = [
+            window.mockCrops = [
                 { id: 1, name: "Wheat", status: "Healthy", lastActivity: "Watered 2 days ago", area: "2.5 acres", yield: "Expected: 3.2 tons" },
                 { id: 2, name: "Corn", status: "Diseased", lastActivity: "Sprayed pesticide 1 day ago", area: "1.8 acres", yield: "Expected: 2.1 tons" },
                 { id: 3, name: "Rice", status: "Healthy", lastActivity: "Fertilized today", area: "3.0 acres", yield: "Expected: 4.5 tons" }
             ];
 
-            let mockLivestock = [
+            window.mockLivestock = [
                 { id: 1, type: "Dairy Cows", status: "Healthy", lastActivity: "Milked 2 hours ago", count: 12, production: "Daily: 240L milk" },
                 { id: 2, type: "Chickens", status: "Healthy", lastActivity: "Fed 1 hour ago", count: 100, production: "Daily: 85 eggs" }
             ];
@@ -274,6 +330,70 @@
             renderCrops();
             renderLivestock();
             checkCriticalAlerts();
+            switchTab('crops'); // Show crops tab by default
+        }
+
+        function checkCriticalAlerts() {
+            const criticalAlerts = document.getElementById('critical-alerts');
+            if (criticalAlerts) {
+                const diseasedCrops = mockCrops.filter(crop => crop.status === 'Diseased');
+                if (diseasedCrops.length > 0) {
+                    criticalAlerts.innerHTML = `Warning: ${diseasedCrops.length} crop(s) need attention`;
+                } else {
+                    criticalAlerts.innerHTML = 'No critical alerts at this time';
+                }
+            }
+        }
+
+        function addNewCrop() {
+            alert('Add New Crop functionality will be implemented here');
+        }
+
+        function addNewLivestock() {
+            alert('Add New Livestock functionality will be implemented here');
+        }
+
+        function showMaintenanceSchedule() {
+            alert('Maintenance Schedule will be shown here');
+        }
+
+        function showWeatherReport() {
+            alert('Weather Report will be shown here');
+        }
+
+        function viewCropDetails(index) {
+            const crop = mockCrops[index];
+            alert(`Viewing details for ${crop.name}\nArea: ${crop.area}\nExpected Yield: ${crop.yield}`);
+        }
+
+        function editCrop(index) {
+            const crop = mockCrops[index];
+            alert(`Editing ${crop.name}`);
+        }
+
+        function deleteCrop(index) {
+            if (confirm(`Are you sure you want to delete ${mockCrops[index].name}?`)) {
+                mockCrops.splice(index, 1);
+                renderCrops();
+                checkCriticalAlerts();
+            }
+        }
+
+        function viewLivestockDetails(index) {
+            const animal = mockLivestock[index];
+            alert(`Viewing details for ${animal.type}\nCount: ${animal.count}\nProduction: ${animal.production}`);
+        }
+
+        function editLivestock(index) {
+            const animal = mockLivestock[index];
+            alert(`Editing ${animal.type}`);
+        }
+
+        function deleteLivestock(index) {
+            if (confirm(`Are you sure you want to delete ${mockLivestock[index].type}?`)) {
+                mockLivestock.splice(index, 1);
+                renderLivestock();
+            }
         }
 
         function renderCrops() {
@@ -336,6 +456,61 @@
             }
         }
 
+        function addMessage(sender, message, type) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${type === 'bot' ? 'justify-start' : 'justify-end'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="${type === 'bot' ? 'bg-green-100' : 'bg-blue-100'} rounded-lg px-4 py-2 max-w-[70%]">
+                    <p class="font-semibold">${sender}</p>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            if (!input || !input.value.trim()) return;
+
+            const message = input.value.trim();
+            addMessage('You', message, 'user');
+            input.value = '';
+
+            // Simulate bot response
+            setTimeout(() => {
+                addMessage('SmartHarvest Assistant', 'I understand your question. This is a demo response. In the full version, I would provide detailed farming advice based on your query.', 'bot');
+            }, 1000);
+        }
+
+        function sendQuickMessage(message) {
+            const input = document.getElementById('message-input');
+            if (input) {
+                input.value = message;
+                sendMessage();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function analyzeImage() {
+            const input = document.getElementById('chat-image');
+            if (!input || !input.files.length) {
+                alert('Please select an image first');
+                return;
+            }
+            alert('Image analysis will be implemented in the full version');
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Show home page by default
@@ -350,9 +525,6 @@
                 });
             });
         });
-
-        // Include all other functions from the original files
-        // ... (copy all other functions from dashboard.html and chatbot.html)
     </script>
 </body>
 </html> 

@@ -200,14 +200,22 @@
                     <p class="text-lg text-gray-600">Your AI farming companion</p>
                 </div>
 
-                <!-- Language Selector -->
-                <div class="flex justify-end mb-4">
-                    <select id="language-select" class="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                    </select>
+                <!-- Language and Voice Controls -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-4">
+                        <select id="language-select" class="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            <option value="en">English</option>
+                            <option value="xh">isiXhosa</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                        <button id="voice-toggle" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                            Enable Voice
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Chat Container -->
@@ -232,25 +240,18 @@
                         </button>
                     </div>
 
-                    <!-- Image Upload -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">
-                            Upload Image for Analysis
-                        </label>
-                        <div class="flex items-center space-x-2">
-                            <input type="file" id="chat-image" accept="image/*" class="flex-1 px-3 py-2 border rounded-lg">
-                            <button onclick="analyzeImage()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                                Analyze
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Message Input -->
+                    <!-- Message Input with Voice -->
                     <div class="flex space-x-2">
                         <input type="text" id="message-input" 
                                class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                placeholder="Type your message here..."
                                onkeypress="handleKeyPress(event)">
+                        <button onclick="toggleVoiceInput()" 
+                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </button>
                         <button onclick="sendMessage()" 
                                 class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                             Send
@@ -562,12 +563,214 @@
             `;
         }
 
+        // Language and Voice Support
+        let currentLanguage = 'en';
+        let isVoiceEnabled = false;
+        let recognition = null;
+
+        // Language translations
+        const translations = {
+            en: {
+                welcome: "Hello! I'm your AI farming assistant. I can help you with crop disease detection, yield prediction, and farming advice. How can I help you today?",
+                voiceEnabled: "Voice input enabled",
+                voiceDisabled: "Voice input disabled",
+                listening: "Listening...",
+                notListening: "Not listening",
+                typeMessage: "Type your message here...",
+                send: "Send",
+                enableVoice: "Enable Voice",
+                quickActions: {
+                    watering: "Watering Guide",
+                    pests: "Pest Control",
+                    harvest: "Harvest Tips",
+                    weather: "Weather"
+                },
+                analysis: {
+                    analyzing: "Analyzing image...",
+                    diseaseDetected: "Disease Detected",
+                    confidence: "Confidence",
+                    recommendations: "Recommendations",
+                    yieldPrediction: "Yield Prediction",
+                    expectedYield: "Expected Yield",
+                    factors: "Contributing Factors"
+                }
+            },
+            xh: {
+                welcome: "Molo! Ndingumncedi wakho wefama. Ndingakunceda ngokufumanisa izifo zesityalo, ukubikezela ivuno, kunye ncebiso zokulima. Ndingakunceda njani namhlanje?",
+                voiceEnabled: "Ukuthetha kuvulwe",
+                voiceDisabled: "Ukuthetha kucinyiwe",
+                listening: "Ndilalela...",
+                notListening: "Andilaleli",
+                typeMessage: "Bhala umyalezo wakho apha...",
+                send: "Thumela",
+                enableVoice: "Vula Izwi",
+                quickActions: {
+                    watering: "Isikhokelo Sokunika Amanzi",
+                    pests: "Ukulawula Izinambuzane",
+                    harvest: "Amacebiso Okuvuna",
+                    weather: "Ixesha"
+                },
+                analysis: {
+                    analyzing: "Ihlalutya umfanekiso...",
+                    diseaseDetected: "Isifo Sifunyenwe",
+                    confidence: "Ukuqiniseka",
+                    recommendations: "Iingcebiso",
+                    yieldPrediction: "Ukubikezela Kwevuno",
+                    expectedYield: "Ivuno Eliqinisekileyo",
+                    factors: "Izinto Ezibangela"
+                }
+            },
+            zu: {
+                welcome: "Sawubona! Ngingusizo lwakho lokulima. Ngingakusiza ngokuthola izifo zezitshalo, ukubikezela isivuno, kanye namacebiso okulima. Ngingakusiza kanjani namhlanje?",
+                voiceEnabled: "Ukukhuluma kuvulwe",
+                voiceDisabled: "Ukukhuluma kucishiwe",
+                listening: "Ngiyazwa...",
+                notListening: "Angizwa",
+                typeMessage: "Bhala umyalezo wakho lapha...",
+                send: "Thumela",
+                enableVoice: "Vula Izwi",
+                quickActions: {
+                    watering: "Isiqondiso Sokunika Amanzi",
+                    pests: "Ukulawula Izilokazane",
+                    harvest: "Amacebiso Okuvuna",
+                    weather: "Isimo Sezulu"
+                },
+                analysis: {
+                    analyzing: "Ihlaziya isithombe...",
+                    diseaseDetected: "Isifo Sitholakele",
+                    confidence: "Ukuqiniseka",
+                    recommendations: "Izincomo",
+                    yieldPrediction: "Ukubikezela Kwevuno",
+                    expectedYield: "Isivuno Esilindelwe",
+                    factors: "Izinto Ezithonyayo"
+                }
+            },
+            af: {
+                welcome: "Hallo! Ek is jou AI-boereassistent. Ek kan jou help met gewas-siektes, opbrengsvoorspelling en boerderyadvies. Hoe kan ek jou vandag help?",
+                voiceEnabled: "Stem ingevoer geaktiveer",
+                voiceDisabled: "Stem ingevoer gedeaktiveer",
+                listening: "Luister...",
+                notListening: "Nie besig om te luister nie",
+                typeMessage: "Tik jou boodskap hier...",
+                send: "Stuur",
+                enableVoice: "Aktiveer Stem",
+                quickActions: {
+                    watering: "Watergids",
+                    pests: "Pesbeheer",
+                    harvest: "Oeswenke",
+                    weather: "Weer"
+                },
+                analysis: {
+                    analyzing: "Ontleed beeld...",
+                    diseaseDetected: "Siekte Opgespoor",
+                    confidence: "Vertroue",
+                    recommendations: "Aanbevelings",
+                    yieldPrediction: "Opbrengsvoorspelling",
+                    expectedYield: "Verwagte Opbrengs",
+                    factors: "Bydraende Faktore"
+                }
+            }
+        };
+
+        // Enhanced voice recognition with feedback
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = currentLanguage;
+
+                recognition.onstart = function() {
+                    isVoiceEnabled = true;
+                    updateVoiceUI(true);
+                    speakFeedback(translations[currentLanguage].listening);
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0].transcript)
+                        .join('');
+                    
+                    document.getElementById('message-input').value = transcript;
+                    
+                    if (event.results[0].isFinal) {
+                        speakFeedback(translations[currentLanguage].notListening);
+                    }
+                };
+
+                recognition.onend = function() {
+                    isVoiceEnabled = false;
+                    updateVoiceUI(false);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    isVoiceEnabled = false;
+                    updateVoiceUI(false);
+                    speakFeedback(translations[currentLanguage].notListening);
+                };
+            } else {
+                alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+            }
+        }
+
+        // Text-to-speech feedback
+        function speakFeedback(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = currentLanguage;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Update voice UI elements
+        function updateVoiceUI(isListening) {
+            const voiceToggle = document.getElementById('voice-toggle');
+            if (isListening) {
+                voiceToggle.textContent = translations[currentLanguage].listening;
+                voiceToggle.classList.remove('bg-green-500');
+                voiceToggle.classList.add('bg-red-500');
+            } else {
+                voiceToggle.textContent = translations[currentLanguage].enableVoice;
+                voiceToggle.classList.remove('bg-red-500');
+                voiceToggle.classList.add('bg-green-500');
+            }
+        }
+
+        // Update quick action buttons
+        function updateQuickActions() {
+            const actions = translations[currentLanguage].quickActions;
+            document.querySelector('button[onclick="sendQuickMessage(\'How do I water my crops?\')"]').textContent = actions.watering;
+            document.querySelector('button[onclick="sendQuickMessage(\'What pests should I watch for?\')"]').textContent = actions.pests;
+            document.querySelector('button[onclick="sendQuickMessage(\'When should I harvest?\')"]').textContent = actions.harvest;
+            document.querySelector('button[onclick="sendQuickMessage(\'Weather forecast?\')"]').textContent = actions.weather;
+        }
+
+        // Enhanced language change handler
+        document.getElementById('language-select').addEventListener('change', function(e) {
+            currentLanguage = e.target.value;
+            if (recognition) {
+                recognition.lang = currentLanguage;
+            }
+            updateUILanguage();
+            updateQuickActions();
+            speakFeedback(translations[currentLanguage].welcome);
+        });
+
+        // Enhanced UI language update
+        function updateUILanguage() {
+            document.getElementById('message-input').placeholder = translations[currentLanguage].typeMessage;
+            document.querySelector('button[onclick="sendMessage()"]').textContent = translations[currentLanguage].send;
+            document.getElementById('voice-toggle').textContent = translations[currentLanguage].enableVoice;
+            updateQuickActions();
+        }
+
         // Enhanced Chatbot Functions
         function initializeChatbot() {
             const chatMessages = document.getElementById('chat-messages');
             if (chatMessages) {
                 chatMessages.innerHTML = '';
-                addMessage("SmartHarvest Assistant", "Hello! I'm your AI farming assistant. I can help you with crop disease detection, yield prediction, and farming advice. How can I help you today?", 'bot');
+                addMessage("SmartHarvest Assistant", translations[currentLanguage].welcome, 'bot');
             }
         }
 

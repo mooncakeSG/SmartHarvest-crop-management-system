@@ -1,32 +1,38 @@
-from app import db
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+db = SQLAlchemy()
+
 class User(db.Model):
+    __tablename__ = 'users'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256), nullable=False)
     full_name = db.Column(db.String(100))
-    farm_name = db.Column(db.String(100))
-    location = db.Column(db.String(200))
+    role = db.Column(db.String(20), default='farmer')  # farmer, admin, expert
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    crops = db.relationship('Crop', backref='farmer', lazy=True)
+    last_login = db.Column(db.DateTime)
+    
+    # Relationships
+    crops = db.relationship('Crop', backref='owner', lazy=True)
     livestock = db.relationship('Livestock', backref='owner', lazy=True)
-
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-
+        
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
+    
     def to_dict(self):
         return {
             'id': self.id,
             'username': self.username,
             'email': self.email,
             'full_name': self.full_name,
-            'farm_name': self.farm_name,
-            'location': self.location,
-            'created_at': self.created_at.isoformat()
+            'role': self.role,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'last_login': self.last_login.isoformat() if self.last_login else None
         } 

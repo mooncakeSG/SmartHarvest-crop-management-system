@@ -31,10 +31,155 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
-            <div class="text-center">
-                <h1 class="text-3xl font-bold text-gray-900 mb-8">Crop & Livestock Management System</h1>
-                <p class="text-lg text-gray-600 mb-8">Redirecting to the management system...</p>
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Crop & Livestock Management System</h1>
+            
+            <!-- Critical Alerts -->
+            <div class="mb-6">
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Critical Alerts</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li id="critical-alerts">No critical alerts at this time</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <button onclick="addNewCrop()" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 flex items-center justify-center">
+                    <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Add New Crop
+                </button>
+                <button onclick="addNewLivestock()" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 flex items-center justify-center">
+                    <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Add New Animal
+                </button>
+                <button onclick="showMaintenanceSchedule()" class="bg-yellow-500 text-white p-4 rounded-lg shadow hover:bg-yellow-600 flex items-center justify-center">
+                    <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Maintenance
+                </button>
+                <button onclick="showWeatherReport()" class="bg-purple-500 text-white p-4 rounded-lg shadow hover:bg-purple-600 flex items-center justify-center">
+                    <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                    </svg>
+                    Weather
+                </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="switchTab('crops')" id="crops-tab" class="border-green-500 text-green-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Crops
+                    </button>
+                    <button onclick="switchTab('livestock')" id="livestock-tab" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Livestock
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Crops Section -->
+            <div id="crops-section">
+                <!-- Dashboard Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                    <div class="bg-green-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Total Crops</h2>
+                        <p id="total-crops" class="text-2xl">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Healthy</h2>
+                        <p id="healthy-crops" class="text-2xl">0</p>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Diseased</h2>
+                        <p id="diseased-crops" class="text-2xl">0</p>
+                    </div>
+                </div>
+
+                <!-- Add New Crop Button -->
+                <div class="mb-4">
+                    <button onclick="addNewCrop()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Add New Crop
+                    </button>
+                </div>
+
+                <!-- Crops Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded shadow">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b">Crop Name</th>
+                                <th class="py-2 px-4 border-b">Status</th>
+                                <th class="py-2 px-4 border-b">Last Activity</th>
+                                <th class="py-2 px-4 border-b">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crop-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Livestock Section -->
+            <div id="livestock-section" class="hidden">
+                <!-- Livestock Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                    <div class="bg-green-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Total Animals</h2>
+                        <p id="total-livestock" class="text-2xl">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Healthy</h2>
+                        <p id="healthy-livestock" class="text-2xl">0</p>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded shadow">
+                        <h2 class="text-lg font-bold">Sick</h2>
+                        <p id="sick-livestock" class="text-2xl">0</p>
+                    </div>
+                </div>
+
+                <!-- Add New Livestock Button -->
+                <div class="mb-4">
+                    <button onclick="addNewLivestock()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Add New Animal
+                    </button>
+                </div>
+
+                <!-- Livestock Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded shadow">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b">Animal Type</th>
+                                <th class="py-2 px-4 border-b">Status</th>
+                                <th class="py-2 px-4 border-b">Last Activity</th>
+                                <th class="py-2 px-4 border-b">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="livestock-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="text-center my-4 hidden">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                <span class="text-gray-500 mt-2 block">Loading...</span>
             </div>
         </div>
     </main>
@@ -49,10 +194,271 @@
     </footer>
 
     <script>
-        // Redirect to the backend dashboard after a short delay
-        setTimeout(() => {
-            window.location.href = 'http://localhost:5000/dashboard';
-        }, 2000);
+        // Mock Data
+        let mockCrops = [
+            { id: 1, name: "Wheat", status: "Healthy", lastActivity: "Watered 2 days ago", area: "2.5 acres", yield: "Expected: 3.2 tons" },
+            { id: 2, name: "Corn", status: "Diseased", lastActivity: "Sprayed pesticide 1 day ago", area: "1.8 acres", yield: "Expected: 2.1 tons" },
+            { id: 3, name: "Rice", status: "Healthy", lastActivity: "Fertilized today", area: "3.0 acres", yield: "Expected: 4.5 tons" },
+            { id: 4, name: "Soybeans", status: "Healthy", lastActivity: "Planted 5 days ago", area: "2.0 acres", yield: "Expected: 2.8 tons" }
+        ];
+
+        let mockLivestock = [
+            { id: 1, type: "Dairy Cows", status: "Healthy", lastActivity: "Milked 2 hours ago", count: 12, production: "Daily: 240L milk" },
+            { id: 2, type: "Chickens", status: "Healthy", lastActivity: "Fed 1 hour ago", count: 100, production: "Daily: 85 eggs" },
+            { id: 3, type: "Pigs", status: "Sick", lastActivity: "Vaccinated yesterday", count: 8, production: "Growing well" }
+        ];
+
+        // Utility Functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function updateSummary() {
+            // Update Crop Summary
+            document.getElementById('total-crops').textContent = mockCrops.length;
+            document.getElementById('healthy-crops').textContent = mockCrops.filter(c => c.status === "Healthy").length;
+            document.getElementById('diseased-crops').textContent = mockCrops.filter(c => c.status === "Diseased").length;
+
+            // Update Livestock Summary
+            document.getElementById('total-livestock').textContent = mockLivestock.length;
+            document.getElementById('healthy-livestock').textContent = mockLivestock.filter(l => l.status === "Healthy").length;
+            document.getElementById('sick-livestock').textContent = mockLivestock.filter(l => l.status === "Sick").length;
+        }
+
+        function renderCrops() {
+            const tbody = document.getElementById('crop-table-body');
+            tbody.innerHTML = '';
+            mockCrops.forEach((crop, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="py-2 px-4 border-b">${crop.name}</td>
+                        <td class="py-2 px-4 border-b">
+                            <span class="px-2 py-1 rounded ${crop.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${crop.status}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4 border-b">${crop.lastActivity}</td>
+                        <td class="py-2 px-4 border-b">
+                            <button class="bg-blue-300 px-2 py-1 rounded mr-2 hover:bg-blue-400" onclick="viewCropDetails(${idx})">View</button>
+                            <button class="bg-yellow-300 px-2 py-1 rounded mr-2 hover:bg-yellow-400" onclick="editCrop(${idx})">Edit</button>
+                            <button class="bg-red-300 px-2 py-1 rounded hover:bg-red-400" onclick="deleteCrop(${idx})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            updateSummary();
+        }
+
+        function renderLivestock() {
+            const tbody = document.getElementById('livestock-table-body');
+            tbody.innerHTML = '';
+            mockLivestock.forEach((animal, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="py-2 px-4 border-b">${animal.type}</td>
+                        <td class="py-2 px-4 border-b">
+                            <span class="px-2 py-1 rounded ${animal.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${animal.status}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4 border-b">${animal.lastActivity}</td>
+                        <td class="py-2 px-4 border-b">
+                            <button class="bg-blue-300 px-2 py-1 rounded mr-2 hover:bg-blue-400" onclick="viewLivestockDetails(${idx})">View</button>
+                            <button class="bg-yellow-300 px-2 py-1 rounded mr-2 hover:bg-yellow-400" onclick="editLivestock(${idx})">Edit</button>
+                            <button class="bg-red-300 px-2 py-1 rounded hover:bg-red-400" onclick="deleteLivestock(${idx})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            updateSummary();
+        }
+
+        function fakeApiCall(callback) {
+            document.getElementById('loading').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                callback();
+            }, 800);
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            const cropsSection = document.getElementById('crops-section');
+            const livestockSection = document.getElementById('livestock-section');
+            const cropsTab = document.getElementById('crops-tab');
+            const livestockTab = document.getElementById('livestock-tab');
+
+            if (tab === 'crops') {
+                cropsSection.classList.remove('hidden');
+                livestockSection.classList.add('hidden');
+                cropsTab.classList.add('border-green-500', 'text-green-600');
+                cropsTab.classList.remove('border-transparent', 'text-gray-500');
+                livestockTab.classList.remove('border-green-500', 'text-green-600');
+                livestockTab.classList.add('border-transparent', 'text-gray-500');
+                fakeApiCall(renderCrops);
+            } else {
+                cropsSection.classList.add('hidden');
+                livestockSection.classList.remove('hidden');
+                livestockTab.classList.add('border-green-500', 'text-green-600');
+                livestockTab.classList.remove('border-transparent', 'text-gray-500');
+                cropsTab.classList.remove('border-green-500', 'text-green-600');
+                cropsTab.classList.add('border-transparent', 'text-gray-500');
+                fakeApiCall(renderLivestock);
+            }
+        }
+
+        // Crop Functions
+        function addNewCrop() {
+            const name = prompt("Enter crop name:");
+            if (name) {
+                fakeApiCall(() => {
+                    mockCrops.push({
+                        id: mockCrops.length + 1,
+                        name: name,
+                        status: "Healthy",
+                        lastActivity: "Planted today",
+                        area: "1.0 acres",
+                        yield: "Expected: 2.0 tons"
+                    });
+                    renderCrops();
+                    showNotification("New crop added successfully!");
+                });
+            }
+        }
+
+        function editCrop(idx) {
+            const crop = mockCrops[idx];
+            const name = prompt("Edit crop name:", crop.name);
+            if (name) {
+                fakeApiCall(() => {
+                    crop.name = name;
+                    renderCrops();
+                    showNotification("Crop updated successfully!");
+                });
+            }
+        }
+
+        function deleteCrop(idx) {
+            if (confirm("Are you sure you want to delete this crop?")) {
+                fakeApiCall(() => {
+                    mockCrops.splice(idx, 1);
+                    renderCrops();
+                    showNotification("Crop deleted successfully!");
+                });
+            }
+        }
+
+        function viewCropDetails(idx) {
+            const crop = mockCrops[idx];
+            alert(`Crop Details:\nName: ${crop.name}\nStatus: ${crop.status}\nArea: ${crop.area}\nExpected Yield: ${crop.yield}\nLast Activity: ${crop.lastActivity}`);
+        }
+
+        // Livestock Functions
+        function addNewLivestock() {
+            const type = prompt("Enter animal type:");
+            if (type) {
+                fakeApiCall(() => {
+                    mockLivestock.push({
+                        id: mockLivestock.length + 1,
+                        type: type,
+                        status: "Healthy",
+                        lastActivity: "Added today",
+                        count: 1,
+                        production: "New addition"
+                    });
+                    renderLivestock();
+                    showNotification("New animal added successfully!");
+                });
+            }
+        }
+
+        function editLivestock(idx) {
+            const animal = mockLivestock[idx];
+            const type = prompt("Edit animal type:", animal.type);
+            if (type) {
+                fakeApiCall(() => {
+                    animal.type = type;
+                    renderLivestock();
+                    showNotification("Animal updated successfully!");
+                });
+            }
+        }
+
+        function deleteLivestock(idx) {
+            if (confirm("Are you sure you want to delete this animal?")) {
+                fakeApiCall(() => {
+                    mockLivestock.splice(idx, 1);
+                    renderLivestock();
+                    showNotification("Animal deleted successfully!");
+                });
+            }
+        }
+
+        function viewLivestockDetails(idx) {
+            const animal = mockLivestock[idx];
+            alert(`Animal Details:\nType: ${animal.type}\nStatus: ${animal.status}\nCount: ${animal.count}\nProduction: ${animal.production}\nLast Activity: ${animal.lastActivity}`);
+        }
+
+        // Weather and Maintenance Functions
+        function showWeatherReport() {
+            const weatherData = {
+                temperature: "24°C",
+                humidity: "65%",
+                forecast: "Sunny with light clouds",
+                rainfall: "0mm expected"
+            };
+            alert(`Weather Report:\nTemperature: ${weatherData.temperature}\nHumidity: ${weatherData.humidity}\nForecast: ${weatherData.forecast}\nRainfall: ${weatherData.rainfall}`);
+        }
+
+        function showMaintenanceSchedule() {
+            const maintenanceTasks = [
+                "Irrigation system check - Due tomorrow",
+                "Fertilizer application - Due in 3 days",
+                "Pest control - Due next week",
+                "Equipment maintenance - Due in 2 weeks"
+            ];
+            alert("Maintenance Schedule:\n\n" + maintenanceTasks.join("\n"));
+        }
+
+        // Critical alerts check
+        function checkCriticalAlerts() {
+            const criticalAlerts = [];
+            
+            // Check for diseased crops
+            const diseasedCrops = mockCrops.filter(c => c.status === "Diseased");
+            if (diseasedCrops.length > 0) {
+                criticalAlerts.push(`${diseasedCrops.length} crops need attention`);
+            }
+
+            // Check for sick livestock
+            const sickLivestock = mockLivestock.filter(l => l.status === "Sick");
+            if (sickLivestock.length > 0) {
+                criticalAlerts.push(`${sickLivestock.length} animals need veterinary care`);
+            }
+
+            // Update alerts display
+            const alertsElement = document.getElementById('critical-alerts');
+            if (criticalAlerts.length > 0) {
+                alertsElement.innerHTML = criticalAlerts.map(alert => `<li>${alert}</li>`).join('');
+            } else {
+                alertsElement.textContent = 'No critical alerts at this time';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fakeApiCall(() => {
+                renderCrops();
+                renderLivestock();
+                checkCriticalAlerts();
+            });
+        });
     </script>
 </body>
 </html> 

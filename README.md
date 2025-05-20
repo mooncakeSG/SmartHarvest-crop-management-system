@@ -1,72 +1,100 @@
 # SmartHarvest - Crop Management System
 
-A modern, full-stack crop management system with features for managing crops, livestock, and an AI-powered smart assistant.
+A modern web application for managing crops and livestock, built with HTML, Tailwind CSS, and JavaScript.
 
-## Live Demo
+## 🌟 Features
 
-Visit the live demo at: [SmartHarvest Landing Page](https://mooncakeSG.github.io/SmartHarvest-crop-management-system/)
+### Dashboard
+- **Crop Management**
+  - View all crops with status and details
+  - Add, edit, and delete crops
+  - Track crop health and activities
+  - View crop statistics
 
-## Features
+- **Livestock Management**
+  - Monitor animal health and status
+  - Track livestock activities
+  - View production metrics
+  - Manage animal inventory
 
-- **Crop & Livestock Management**
-  - Track crop growth and health
-  - Monitor livestock
-  - Manage farm resources
-  - Weather integration
+- **Quick Actions**
+  - Add new crops/animals
+  - View maintenance schedule
+  - Check weather reports
+  - Monitor critical alerts
 
-- **Smart Assistant**
-  - AI-powered chatbot
-  - Multilingual support
-  - Real-time farm advice
-  - Disease detection
+### Smart Assistant
+- **Interactive Chatbot**
+  - Get instant farming advice
+  - Quick action buttons for common queries
+  - Multi-language support
+  - Real-time responses
 
-## Tech Stack
+- **Topics Covered**
+  - Watering and irrigation
+  - Pest control
+  - Harvest timing
+  - Weather information
+  - General farming queries
 
-- Frontend: HTML, Tailwind CSS, JavaScript
-- Backend: Flask (Python)
-- Database: PostgreSQL
-- AI/ML: TensorFlow, OpenCV
-
-## Development
+## 🚀 Getting Started
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mooncakeSG/SmartHarvest-crop-management-system.git
+git clone https://github.com/yourusername/crop-management-system.git
 ```
 
-2. Set up the backend:
+2. Navigate to the project directory:
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
+cd crop-management-system
 ```
 
-3. Set up the chatbot service:
-```bash
-cd chatbot
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
-```
+3. Open the frontend files in your browser:
+   - Open `frontend/index.html` for the landing page
+   - Open `frontend/dashboard.html` for the dashboard
+   - Open `frontend/chatbot.html` for the smart assistant
 
-4. Run the services:
-```bash
-# Backend (in backend directory)
-flask run
+## 🛠️ Technology Stack
 
-# Chatbot (in chatbot directory)
-flask run --port 5001
-```
+- **Frontend**
+  - HTML5
+  - Tailwind CSS
+  - JavaScript (Vanilla)
+  - Responsive Design
 
-## Contributing
+- **Features**
+  - Modern UI/UX
+  - Real-time updates
+  - Interactive components
+  - Multi-language support
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 📱 Prototype Features
 
-## License
+### Dashboard
+- Mock data for crops and livestock
+- Interactive tables and cards
+- Simulated API calls
+- Loading states and notifications
+
+### Smart Assistant
+- Context-aware responses
+- Quick action buttons
+- Typing indicators
+- Language selection
+
+## 🔮 Future Enhancements
+
+- [ ] Backend integration
+- [ ] User authentication
+- [ ] Real-time data updates
+- [ ] Advanced analytics
+- [ ] Mobile app version
+
+## 👨‍💻 Developer
+
+- **Name:** Keawin Koesnel
+- **Year:** 2025
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-
-Developed by Keawin Koesnel – 2025

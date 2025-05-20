@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1920" height="1080" fill="#16A34A"/>
-    <g opacity="0.1">
-        <path d="M0 0L1920 1080" stroke="white" stroke-width="2"/>
-        <path d="M1920 0L0 1080" stroke="white" stroke-width="2"/>
-        <circle cx="960" cy="540" r="400" stroke="white" stroke-width="2"/>
-        <circle cx="960" cy="540" r="300" stroke="white" stroke-width="2"/>
-        <circle cx="960" cy="540" r="200" stroke="white" stroke-width="2"/>
-    </g>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#16a34a" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+    </defs>
+    <rect width="100" height="100" fill="#f0fdf4"/>
+    <rect width="100" height="100" fill="url(#grid)"/>
 </svg> 

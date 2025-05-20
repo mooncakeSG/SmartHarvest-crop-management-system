@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartHarvest - Crop Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/svg+xml" href="frontend/assets/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="./frontend/assets/logo.svg">
     <style>
         .hero-pattern {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('frontend/assets/hero-bg.svg');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./frontend/assets/hero-bg.svg');
             background-size: cover;
             background-position: center;
         }
@@ -40,7 +40,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="#" onclick="showPage('home')" class="flex-shrink-0 flex items-center">
-                        <img class="h-8 w-auto" src="frontend/assets/logo.svg" alt="SmartHarvest Logo">
+                        <img class="h-8 w-auto" src="./frontend/assets/logo.svg" alt="SmartHarvest Logo">
                         <span class="ml-2 text-xl font-bold text-green-600">SmartHarvest</span>
                     </a>
                 </div>
@@ -271,13 +271,21 @@
             });
             
             // Show selected page
-            document.getElementById(pageId).classList.add('active');
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
             
             // Update navigation
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            event.target.classList.add('active');
+            
+            // Find and activate the clicked link
+            const clickedLink = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+            if (clickedLink) {
+                clickedLink.classList.add('active');
+            }
             
             // Scroll to top
             window.scrollTo(0, 0);

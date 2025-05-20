@@ -3,31 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartHarvest - Redirecting...</title>
-    <meta http-equiv="refresh" content="0;url=frontend/index.html">
+    <title>SmartHarvest - Crop Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="frontend/assets/favicon.svg">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+        .hero-pattern {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('frontend/assets/hero-bg.svg');
+            background-size: cover;
+            background-position: center;
         }
-        .message {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .nav-link {
+            cursor: pointer;
+        }
+        .nav-link.active {
+            color: #16a34a;
         }
     </style>
 </head>
-<body>
-    <div class="message">
-        <h1>Redirecting to SmartHarvest...</h1>
-        <p>If you are not redirected automatically, <a href="frontend/index.html">click here</a>.</p>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" onclick="showPage('home')" class="flex-shrink-0 flex items-center">
+                        <img class="h-8 w-auto" src="frontend/assets/logo.svg" alt="SmartHarvest Logo">
+                        <span class="ml-2 text-xl font-bold text-green-600">SmartHarvest</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a onclick="showPage('home')" class="nav-link text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a onclick="showPage('dashboard')" class="nav-link text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a onclick="showPage('chatbot')" class="nav-link text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Assistant</a>
+                    <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page active pt-16">
+        <div class="hero-pattern min-h-[600px] flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+                    SmartHarvest: Smarter Farming Starts Here
+                </h1>
+                <p class="text-xl md:text-2xl text-white mb-8">
+                    Manage your farm and get AI-powered guidance with ease.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center gap-4">
+                    <a onclick="showPage('dashboard')" class="btn-hover bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 cursor-pointer">
+                        Manage Crops & Livestock
+                    </a>
+                    <a onclick="showPage('chatbot')" class="btn-hover bg-white text-green-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 cursor-pointer">
+                        Ask Smart Assistant
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page pt-16">
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <h1 class="text-3xl font-bold text-gray-900 mb-8">Crop & Livestock Management System</h1>
+                
+                <!-- Critical Alerts -->
+                <div class="mb-6">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Critical Alerts</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li id="critical-alerts">No critical alerts at this time</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <button onclick="addNewCrop()" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 flex items-center justify-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add New Crop
+                    </button>
+                    <button onclick="addNewLivestock()" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 flex items-center justify-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add New Animal
+                    </button>
+                    <button onclick="showMaintenanceSchedule()" class="bg-yellow-500 text-white p-4 rounded-lg shadow hover:bg-yellow-600 flex items-center justify-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Maintenance
+                    </button>
+                    <button onclick="showWeatherReport()" class="bg-purple-500 text-white p-4 rounded-lg shadow hover:bg-purple-600 flex items-center justify-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                        </svg>
+                        Weather
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="-mb-px flex space-x-8">
+                        <button onclick="switchTab('crops')" id="crops-tab" class="border-green-500 text-green-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Crops
+                        </button>
+                        <button onclick="switchTab('livestock')" id="livestock-tab" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Livestock
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Content sections will be loaded here -->
+                <div id="dashboard-content"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chatbot Page -->
+    <div id="chatbot" class="page pt-16">
+        <main class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Smart Assistant</h1>
+                    <p class="text-lg text-gray-600">Your AI farming companion</p>
+                </div>
+
+                <!-- Language Selector -->
+                <div class="flex justify-end mb-4">
+                    <select id="language-select" class="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+
+                <!-- Chat Container -->
+                <div class="bg-white rounded-lg shadow-lg p-4 mb-4">
+                    <div id="chat-messages" class="h-96 overflow-y-auto mb-4 space-y-4">
+                        <!-- Messages will be added here -->
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                        <button onclick="sendQuickMessage('How do I water my crops?')" class="bg-green-100 text-green-800 px-3 py-2 rounded hover:bg-green-200">
+                            Watering Guide
+                        </button>
+                        <button onclick="sendQuickMessage('What pests should I watch for?')" class="bg-blue-100 text-blue-800 px-3 py-2 rounded hover:bg-blue-200">
+                            Pest Control
+                        </button>
+                        <button onclick="sendQuickMessage('When should I harvest?')" class="bg-yellow-100 text-yellow-800 px-3 py-2 rounded hover:bg-yellow-200">
+                            Harvest Tips
+                        </button>
+                        <button onclick="sendQuickMessage('Weather forecast?')" class="bg-purple-100 text-purple-800 px-3 py-2 rounded hover:bg-purple-200">
+                            Weather
+                        </button>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Upload Image for Analysis
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="file" id="chat-image" accept="image/*" class="flex-1 px-3 py-2 border rounded-lg">
+                            <button onclick="analyzeImage()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                Analyze
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Message Input -->
+                    <div class="flex space-x-2">
+                        <input type="text" id="message-input" 
+                               class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                               placeholder="Type your message here..."
+                               onkeypress="handleKeyPress(event)">
+                        <button onclick="sendMessage()" 
+                                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-8">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500">
+                Developed by Keawin Koesnel – 2025
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Load dashboard content
+        async function loadDashboardContent() {
+            const response = await fetch('frontend/dashboard.html');
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const content = doc.querySelector('main').innerHTML;
+            document.getElementById('dashboard-content').innerHTML = content;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load dashboard content
+            loadDashboardContent();
+            
+            // Initialize chatbot
+            addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. I can help you with crop management, pest control, weather information, and more. You can also upload images for analysis. How can I help you today?", 'bot');
+        });
+
+        // Include all the JavaScript from dashboard.html and chatbot.html here
+        // ... (copy all the JavaScript functions from both files)
+    </script>
 </body>
 </html> 

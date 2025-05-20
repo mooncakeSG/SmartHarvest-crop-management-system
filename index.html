@@ -105,17 +105,17 @@
 
                 <!-- Quick Actions -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <button onclick="addNewCrop()" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 flex items-center justify-center">
+                    <button onclick="analyzeCropImage()" class="bg-green-500 text-white p-4 rounded-lg shadow hover:bg-green-600 flex items-center justify-center">
                         <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Add New Crop
+                        Analyze Crop
                     </button>
-                    <button onclick="addNewLivestock()" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 flex items-center justify-center">
+                    <button onclick="predictYield()" class="bg-blue-500 text-white p-4 rounded-lg shadow hover:bg-blue-600 flex items-center justify-center">
                         <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
-                        Add New Animal
+                        Predict Yield
                     </button>
                     <button onclick="showMaintenanceSchedule()" class="bg-yellow-500 text-white p-4 rounded-lg shadow hover:bg-yellow-600 flex items-center justify-center">
                         <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,6 +129,14 @@
                         </svg>
                         Weather
                     </button>
+                </div>
+
+                <!-- AI Analysis Section -->
+                <div id="ai-analysis" class="bg-white shadow-lg rounded-lg p-6 mb-6" style="display: none;">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">AI Analysis Results</h2>
+                    <div id="analysis-content" class="space-y-4">
+                        <!-- Results will be displayed here -->
+                    </div>
                 </div>
 
                 <!-- Tabs -->
@@ -454,13 +462,112 @@
             });
         }
 
-        // Chatbot Functions
+        // AI Analysis Functions
+        function analyzeCropImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    // Show loading state
+                    showAnalysisSection();
+                    document.getElementById('analysis-content').innerHTML = `
+                        <div class="flex items-center justify-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                            <span class="ml-2">Analyzing image...</span>
+                        </div>
+                    `;
+
+                    // Simulate AI analysis (replace with actual API call)
+                    setTimeout(() => {
+                        const results = {
+                            disease: "Leaf Blight",
+                            confidence: 0.89,
+                            recommendations: [
+                                "Apply fungicide treatment",
+                                "Increase air circulation",
+                                "Monitor humidity levels"
+                            ]
+                        };
+                        displayAnalysisResults(results);
+                    }, 2000);
+                }
+            };
+            input.click();
+        }
+
+        function predictYield() {
+            showAnalysisSection();
+            document.getElementById('analysis-content').innerHTML = `
+                <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                    <span class="ml-2">Calculating yield prediction...</span>
+                </div>
+            `;
+
+            // Simulate yield prediction (replace with actual API call)
+            setTimeout(() => {
+                const prediction = {
+                    expectedYield: "3.2 tons",
+                    confidence: 0.85,
+                    factors: [
+                        "Optimal weather conditions",
+                        "Good soil quality",
+                        "Proper irrigation"
+                    ]
+                };
+                displayYieldPrediction(prediction);
+            }, 2000);
+        }
+
+        function showAnalysisSection() {
+            const section = document.getElementById('ai-analysis');
+            section.style.display = 'block';
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayAnalysisResults(results) {
+            document.getElementById('analysis-content').innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-red-800">Disease Detected</h3>
+                        <p class="text-red-700">${results.disease} (${(results.confidence * 100).toFixed(1)}% confidence)</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-green-800">Recommendations</h3>
+                        <ul class="list-disc list-inside text-green-700">
+                            ${results.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayYieldPrediction(prediction) {
+            document.getElementById('analysis-content').innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800">Yield Prediction</h3>
+                        <p class="text-blue-700">Expected Yield: ${prediction.expectedYield}</p>
+                        <p class="text-blue-700">Confidence: ${(prediction.confidence * 100).toFixed(1)}%</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-green-800">Contributing Factors</h3>
+                        <ul class="list-disc list-inside text-green-700">
+                            ${prediction.factors.map(factor => `<li>${factor}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enhanced Chatbot Functions
         function initializeChatbot() {
-            // Clear previous messages
             const chatMessages = document.getElementById('chat-messages');
             if (chatMessages) {
                 chatMessages.innerHTML = '';
-                addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. I can help you with crop management, pest control, weather information, and more. You can also upload images for analysis. How can I help you today?", 'bot');
+                addMessage("SmartHarvest Assistant", "Hello! I'm your AI farming assistant. I can help you with crop disease detection, yield prediction, and farming advice. How can I help you today?", 'bot');
             }
         }
 
@@ -490,9 +597,19 @@
             addMessage('You', message, 'user');
             input.value = '';
 
-            // Simulate bot response
+            // Simulate AI response based on message content
             setTimeout(() => {
-                addMessage('SmartHarvest Assistant', 'I understand your question. This is a demo response. In the full version, I would provide detailed farming advice based on your query.', 'bot');
+                let response = '';
+                if (message.toLowerCase().includes('disease')) {
+                    response = "I can help you identify plant diseases. Please upload an image of the affected plant, and I'll analyze it for you.";
+                } else if (message.toLowerCase().includes('yield')) {
+                    response = "I can help predict your crop yield. Please provide details about your crop type, planting date, and current conditions.";
+                } else if (message.toLowerCase().includes('weather')) {
+                    response = "I can provide weather forecasts and recommendations. Would you like to see the 7-day forecast for your location?";
+                } else {
+                    response = "I understand your question. As an AI farming assistant, I can help with disease detection, yield prediction, and farming advice. What specific information would you like?";
+                }
+                addMessage('SmartHarvest Assistant', response, 'bot');
             }, 1000);
         }
 

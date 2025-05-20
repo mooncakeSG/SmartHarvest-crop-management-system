@@ -6,7 +6,6 @@
     <title>Smart Assistant - SmartHarvest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <base href="/crop-management-system/">
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
@@ -14,15 +13,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/crop-management-system/" class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
                         <img class="h-8 w-auto" src="assets/logo.svg" alt="SmartHarvest Logo">
                         <span class="ml-2 text-xl font-bold text-green-600">SmartHarvest</span>
                     </a>
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="/crop-management-system/" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="/crop-management-system/dashboard.html" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                    <a href="/crop-management-system/chatbot.html" class="text-green-600 px-3 py-2 rounded-md text-sm font-medium">Assistant</a>
+                    <a href="index.html" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="dashboard.html" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="chatbot.html" class="text-green-600 px-3 py-2 rounded-md text-sm font-medium">Assistant</a>
                     <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
                 </div>
             </div>
@@ -69,6 +68,19 @@
                     </button>
                 </div>
 
+                <!-- Image Upload -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Upload Image for Analysis
+                    </label>
+                    <div class="flex items-center space-x-2">
+                        <input type="file" id="chat-image" accept="image/*" class="flex-1 px-3 py-2 border rounded-lg">
+                        <button onclick="analyzeImage()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Message Input -->
                 <div class="flex space-x-2">
                     <input type="text" id="message-input" 
@@ -94,38 +106,48 @@
     </footer>
 
     <script>
-        // Mock responses for different queries
+        // Enhanced responses for different queries
         const responses = {
             'watering': [
-                "Water your crops early in the morning or late in the evening to minimize evaporation.",
-                "Most crops need about 1 inch of water per week.",
-                "Check soil moisture by inserting your finger 2-3 inches into the soil."
+                "Water your crops early in the morning or late in the evening to minimize evaporation. Most crops need about 1 inch of water per week. Check soil moisture by inserting your finger 2-3 inches into the soil.",
+                "For optimal watering: 1) Use drip irrigation for efficiency, 2) Water deeply but less frequently, 3) Adjust based on weather conditions, 4) Monitor soil moisture regularly.",
+                "Watering tips: Morning watering reduces disease risk, evening watering is good for hot climates, and always water at the base of plants to prevent leaf diseases."
             ],
             'pests': [
-                "Common pests include aphids, caterpillars, and beetles.",
-                "Use organic pesticides when possible.",
-                "Regular inspection of leaves and stems helps catch infestations early."
+                "Common pests to watch for: 1) Aphids - small, soft-bodied insects, 2) Caterpillars - check for chewed leaves, 3) Beetles - look for holes in leaves, 4) Spider mites - check for webbing. Use organic pesticides when possible and maintain good plant health.",
+                "Pest control strategy: 1) Regular inspection of leaves and stems, 2) Use companion planting, 3) Maintain proper spacing, 4) Consider natural predators, 5) Use organic pesticides as last resort.",
+                "Early signs of pest problems: 1) Discolored leaves, 2) Holes in foliage, 3) Sticky residue, 4) Wilting plants. Act quickly when you notice these signs!"
             ],
             'harvest': [
-                "Harvest when fruits/vegetables reach their mature size and color.",
-                "Morning harvest is best for most crops.",
-                "Use clean, sharp tools to avoid damaging plants."
+                "Harvest timing tips: 1) Check for mature size and color, 2) Morning harvest is best for most crops, 3) Use clean, sharp tools, 4) Handle produce gently to prevent bruising.",
+                "For best results: Harvest when fruits/vegetables reach their peak ripeness, avoid harvesting in wet conditions, and store properly immediately after harvest.",
+                "Harvest indicators: 1) Color change, 2) Firmness test, 3) Size check, 4) Smell test for fruits. Remember, different crops have different harvest indicators!"
             ],
             'weather': [
-                "Today's forecast: Sunny, 24°C, light breeze.",
-                "Next 3 days: Clear skies, perfect for outdoor work.",
-                "No significant rainfall expected this week."
+                "Today's forecast: Sunny, 24°C, light breeze. Perfect conditions for outdoor work. No significant rainfall expected.",
+                "Weather outlook: Clear skies for the next 3 days. Ideal for planting and maintenance work. UV index: Moderate - wear sun protection.",
+                "Current conditions: Temperature 24°C, Humidity 65%, Wind 10 km/h. Great weather for crop growth and maintenance activities."
+            ],
+            'disease': [
+                "Common plant diseases: 1) Powdery mildew - white powdery spots, 2) Leaf spot - brown/black spots, 3) Blight - rapid wilting, 4) Root rot - yellowing leaves. Early detection is key!",
+                "Disease prevention: 1) Proper spacing, 2) Good air circulation, 3) Regular inspection, 4) Clean tools, 5) Crop rotation.",
+                "Treatment options: 1) Remove affected parts, 2) Apply appropriate fungicide, 3) Improve growing conditions, 4) Consider resistant varieties for next season."
+            ],
+            'fertilizer': [
+                "Fertilizer basics: 1) NPK ratio is important, 2) Apply during growing season, 3) Follow package instructions, 4) Water after application.",
+                "Organic options: 1) Compost, 2) Manure, 3) Bone meal, 4) Fish emulsion. These provide slow-release nutrients and improve soil health.",
+                "Application tips: 1) Test soil first, 2) Apply evenly, 3) Avoid over-fertilizing, 4) Consider crop-specific needs."
             ],
             'default': [
-                "I'm here to help with your farming questions!",
-                "Could you please provide more details about your query?",
-                "I can help with crop management, pest control, and weather information."
+                "I'm here to help with your farming questions! What specific aspect would you like to know more about?",
+                "I can help with crop management, pest control, weather information, and more. What's on your mind?",
+                "Feel free to ask about any farming topic, or upload an image for analysis. I'm here to assist!"
             ]
         };
 
         // Initialize chat with welcome message
         document.addEventListener('DOMContentLoaded', () => {
-            addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. How can I help you today?", 'bot');
+            addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. I can help you with crop management, pest control, weather information, and more. You can also upload images for analysis. How can I help you today?", 'bot');
         });
 
         function addMessage(sender, text, type = 'user') {
@@ -176,6 +198,8 @@
             if (message.includes('pest')) return responses.pests;
             if (message.includes('harvest')) return responses.harvest;
             if (message.includes('weather')) return responses.weather;
+            if (message.includes('disease')) return responses.disease;
+            if (message.includes('fertilizer')) return responses.fertilizer;
             return responses.default;
         }
 
@@ -209,11 +233,49 @@
             }
         }
 
+        function analyzeImage() {
+            const fileInput = document.getElementById('chat-image');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    showTypingIndicator();
+                    
+                    // Simulate image analysis
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        
+                        // Random analysis results
+                        const analyses = [
+                            "I can see this is a healthy crop with good leaf development. Continue your current care routine.",
+                            "There are signs of mild nutrient deficiency. Consider applying a balanced fertilizer.",
+                            "I notice some pest damage on the leaves. Check for common pests and consider organic pest control.",
+                            "The plant shows good growth but could benefit from more water. Increase watering frequency slightly.",
+                            "This appears to be a healthy animal with good body condition. Continue current care routine.",
+                            "The animal shows signs of mild stress. Monitor behavior and consider veterinary consultation if symptoms persist."
+                        ];
+                        
+                        const analysis = analyses[Math.floor(Math.random() * analyses.length)];
+                        addMessage("SmartHarvest Assistant", `Image Analysis:\n${analysis}`, 'bot');
+                    }, 2000);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                addMessage("SmartHarvest Assistant", "Please select an image to analyze.", 'bot');
+            }
+        }
+
         // Language selector functionality
         document.getElementById('language-select').addEventListener('change', function(e) {
             const language = e.target.value;
-            // In a real implementation, this would change the language of the interface
-            addMessage("SmartHarvest Assistant", `Language changed to ${language}. How can I help you?`, 'bot');
+            const languageNames = {
+                'en': 'English',
+                'es': 'Spanish',
+                'fr': 'French',
+                'de': 'German'
+            };
+            addMessage("SmartHarvest Assistant", `Language changed to ${languageNames[language]}. How can I help you?`, 'bot');
         });
     </script>
 </body>

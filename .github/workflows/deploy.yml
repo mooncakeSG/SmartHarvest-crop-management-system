@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,4 +27,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: frontend
-          branch: gh-pages 
+          branch: gh-pages
+          clean: true 

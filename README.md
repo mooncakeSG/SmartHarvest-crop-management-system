@@ -1,106 +1,72 @@
-# Crop Management System
+# SmartHarvest - Crop Management System
 
-The Crop Management System is a machine learning-based project designed to provide predictions and recommendations for farmers. The system uses different algorithms to predict crops, recommend fertilizers, and provide rainfall and yield predictions to help farmers make informed decisions about their crops.
+A modern, full-stack crop management system with features for managing crops, livestock, and an AI-powered smart assistant.
 
-## Installation
+## Live Demo
 
-1. Clone the repository to your local machine.
-```bash
-git clone https://github.com/ab007shetty/crop-management-system.git
-```
-2. Install the required packages using pip.
-```
-pip install -r requirements.txt
-```
-3. Run Apache web server using XAMPP.
+Visit the live demo at: [SmartHarvest Landing Page](https://mooncakeSG.github.io/SmartHarvest-crop-management-system/)
 
 ## Features
-- Crop Prediction
-- Crop Recommendation
-- Fertilizer Recommendation
-- Rainfall Prediction
-- Yield Prediction
 
-## Technologies Used
-- Python
-- PHP
-- Pandas
-- NumPy
-- JavaScript
-- HTML/CSS
-- Bootstrap4
-- Scikit-learn
+- **Crop & Livestock Management**
+  - Track crop growth and health
+  - Monitor livestock
+  - Manage farm resources
+  - Weather integration
 
-## Dataset
-The Crop Management System dataset includes the following features:
+- **Smart Assistant**
+  - AI-powered chatbot
+  - Multilingual support
+  - Real-time farm advice
+  - Disease detection
 
-### Crop Prediction Dataset
-- State_Name
-- District_Name
-- Season
-- Crop
+## Tech Stack
 
-### Crop Recommendation Dataset
-- N
-- P
-- K
-- Temperature
-- Humidity
-- pH
-- Rainfall
-- Label
+- Frontend: HTML, Tailwind CSS, JavaScript
+- Backend: Flask (Python)
+- Database: PostgreSQL
+- AI/ML: TensorFlow, OpenCV
 
-### Fertilizer Recommendation Dataset
-- Temparature
-- Humidity
-- Soil Moisture
-- Soil Type
-- Crop Type
-- Nitrogen
-- Phosphorous
-- Potassium
-- Fertilizer Name
+## Development
 
-### Rainfall Prediction Dataset
-- SUBDIVISION
-- YEAR
-- JAN
-- FEB
-- MAR
-- APR
-- MAY
-- JUN
-- JUL
-- AUG
-- SEP
-- OCT
-- NOV
-- DEC
-- ANNUAL
-- Jan-Feb
-- Mar-May
-- Jun-Sep
-- Oct-Dec
+1. Clone the repository:
+```bash
+git clone https://github.com/mooncakeSG/SmartHarvest-crop-management-system.git
+```
 
-### Yield Prediction Dataset
-- State_Name
-- District_Name
-- Crop_Year
-- Season
-- Crop
-- Area
-- Production
+2. Set up the backend:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-## How to Use
-- Crop Prediction: Input `State_Name`, `District_Name`, and `Season` to get the predicted crop for that location.
-- Crop Recommendation: Input `N`, `P`, `K`, `Temperature`, `Humidity`, `pH`, and `Rainfall` for that location to get recommended crops for that location.
-- Fertilizer Recommendation: Input `Temperature`, `Humidity`, `Soil Moisture`, `Soil Type`, `Crop Type`, `Nitrogen`, `Phosphorous`, and `Potassium` to get recommended fertilizer for that crop and location.
-- Rainfall Prediction: Input `Subdivision` and `Year` to get rainfall prediction for that year.
-- Yield Prediction: Input `State_Name`, `District_Name`, `Crop_Year`, `Season`, `Crop`, `Area`, `Production` to get predicted yields for that crop and location.
+3. Set up the chatbot service:
+```bash
+cd chatbot
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-## Contributors
-- AB Shetty
-- ChatGPT 3.5 Turbo
+4. Run the services:
+```bash
+# Backend (in backend directory)
+flask run
+
+# Chatbot (in chatbot directory)
+flask run --port 5001
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Developed by Keawin Koesnel – 2025

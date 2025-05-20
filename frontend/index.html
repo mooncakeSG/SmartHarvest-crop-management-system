@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHarvest - Smarter Farming Starts Here</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <base href="/crop-management-system/">
+    <style>
+        .hero-pattern {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('assets/hero-bg.svg');
+            background-size: cover;
+            background-position: center;
+        }
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/crop-management-system/" class="flex-shrink-0 flex items-center">
+                        <img class="h-8 w-auto" src="assets/logo.svg" alt="SmartHarvest Logo">
+                        <span class="ml-2 text-xl font-bold text-green-600">SmartHarvest</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/crop-management-system/" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="/crop-management-system/dashboard.html" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="/crop-management-system/chatbot.html" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Assistant</a>
+                    <a href="#" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-600 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/crop-management-system/" class="block text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="/crop-management-system/dashboard.html" class="block text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="/crop-management-system/chatbot.html" class="block text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-base font-medium">Assistant</a>
+                <a href="#" class="block text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-base font-medium">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-pattern min-h-[600px] flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+                SmartHarvest: Smarter Farming Starts Here
+            </h1>
+            <p class="text-xl md:text-2xl text-white mb-8">
+                Manage your farm and get AI-powered guidance with ease.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="/crop-management-system/dashboard.html" class="btn-hover bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700">
+                    Manage Crops & Livestock
+                </a>
+                <a href="/crop-management-system/chatbot.html" class="btn-hover bg-white text-green-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100">
+                    Ask Smart Assistant
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-8">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500">
+                Developed by Keawin Koesnel – 2025
+            </p>
+        </div>
+    </footer>
+
+    <!-- Mobile menu script -->
+    <script>
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html> 

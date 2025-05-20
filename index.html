@@ -247,29 +247,112 @@
             
             // Scroll to top
             window.scrollTo(0, 0);
+
+            // Initialize page content if needed
+            if (pageId === 'dashboard') {
+                initializeDashboard();
+            } else if (pageId === 'chatbot') {
+                initializeChatbot();
+            }
         }
 
-        // Load dashboard content
-        async function loadDashboardContent() {
-            const response = await fetch('frontend/dashboard.html');
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('main').innerHTML;
-            document.getElementById('dashboard-content').innerHTML = content;
+        // Dashboard Functions
+        function initializeDashboard() {
+            // Mock Data
+            let mockCrops = [
+                { id: 1, name: "Wheat", status: "Healthy", lastActivity: "Watered 2 days ago", area: "2.5 acres", yield: "Expected: 3.2 tons" },
+                { id: 2, name: "Corn", status: "Diseased", lastActivity: "Sprayed pesticide 1 day ago", area: "1.8 acres", yield: "Expected: 2.1 tons" },
+                { id: 3, name: "Rice", status: "Healthy", lastActivity: "Fertilized today", area: "3.0 acres", yield: "Expected: 4.5 tons" }
+            ];
+
+            let mockLivestock = [
+                { id: 1, type: "Dairy Cows", status: "Healthy", lastActivity: "Milked 2 hours ago", count: 12, production: "Daily: 240L milk" },
+                { id: 2, type: "Chickens", status: "Healthy", lastActivity: "Fed 1 hour ago", count: 100, production: "Daily: 85 eggs" }
+            ];
+
+            // Render initial content
+            renderCrops();
+            renderLivestock();
+            checkCriticalAlerts();
+        }
+
+        function renderCrops() {
+            const tbody = document.getElementById('crop-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            mockCrops.forEach((crop, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="py-2 px-4 border-b">${crop.name}</td>
+                        <td class="py-2 px-4 border-b">
+                            <span class="px-2 py-1 rounded ${crop.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${crop.status}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4 border-b">${crop.lastActivity}</td>
+                        <td class="py-2 px-4 border-b">
+                            <button class="bg-blue-300 px-2 py-1 rounded mr-2 hover:bg-blue-400" onclick="viewCropDetails(${idx})">View</button>
+                            <button class="bg-yellow-300 px-2 py-1 rounded mr-2 hover:bg-yellow-400" onclick="editCrop(${idx})">Edit</button>
+                            <button class="bg-red-300 px-2 py-1 rounded hover:bg-red-400" onclick="deleteCrop(${idx})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderLivestock() {
+            const tbody = document.getElementById('livestock-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            mockLivestock.forEach((animal, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="py-2 px-4 border-b">${animal.type}</td>
+                        <td class="py-2 px-4 border-b">
+                            <span class="px-2 py-1 rounded ${animal.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${animal.status}
+                            </span>
+                        </td>
+                        <td class="py-2 px-4 border-b">${animal.lastActivity}</td>
+                        <td class="py-2 px-4 border-b">
+                            <button class="bg-blue-300 px-2 py-1 rounded mr-2 hover:bg-blue-400" onclick="viewLivestockDetails(${idx})">View</button>
+                            <button class="bg-yellow-300 px-2 py-1 rounded mr-2 hover:bg-yellow-400" onclick="editLivestock(${idx})">Edit</button>
+                            <button class="bg-red-300 px-2 py-1 rounded hover:bg-red-400" onclick="deleteLivestock(${idx})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Chatbot Functions
+        function initializeChatbot() {
+            // Clear previous messages
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                chatMessages.innerHTML = '';
+                addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. I can help you with crop management, pest control, weather information, and more. You can also upload images for analysis. How can I help you today?", 'bot');
+            }
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Load dashboard content
-            loadDashboardContent();
+            // Show home page by default
+            showPage('home');
             
-            // Initialize chatbot
-            addMessage("SmartHarvest Assistant", "Hello! I'm your farming assistant. I can help you with crop management, pest control, weather information, and more. You can also upload images for analysis. How can I help you today?", 'bot');
+            // Add click handlers to navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = e.target.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    showPage(pageId);
+                });
+            });
         });
 
-        // Include all the JavaScript from dashboard.html and chatbot.html here
-        // ... (copy all the JavaScript functions from both files)
+        // Include all other functions from the original files
+        // ... (copy all other functions from dashboard.html and chatbot.html)
     </script>
 </body>
 </html> 

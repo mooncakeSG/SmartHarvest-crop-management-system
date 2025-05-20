@@ -5,6 +5,4 @@ buildCommand = "cd backend && pip install -r requirements.txt"
 [deploy]
 startCommand = "cd backend && gunicorn app:app"
 healthcheckPath = "/"
-healthcheckTimeout = 100
-restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 10 
+healthcheckTimeout = 100 

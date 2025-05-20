@@ -1,41 +1,23 @@
-# Build stage
-FROM python:3.10 as builder
+FROM python:3.10
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libpq-dev \
+    gcc \
     python3-dev \
-    libjpeg-dev \
-    zlib1g-dev \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements first
 COPY requirements.txt .
+
+# Install Python packages
 RUN python -m pip install --upgrade pip && \
-    pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+    pip install -r requirements.txt
 
-# Runtime stage
-FROM python:3.10-slim
-
-WORKDIR /app
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    libpq5 \
-    libjpeg62-turbo \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy wheels from builder
-COPY --from=builder /app/wheels /wheels
-COPY --from=builder /app/requirements.txt .
-
-# Install Python packages from wheels
-RUN pip install --no-cache /wheels/*
-
-# Copy application code
+# Copy the rest of the application
 COPY . .
 
 # Set environment variables

@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
 # Copy the entire backend directory
 COPY . /app/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies with verbose output
+RUN pip install --no-cache-dir -v -r requirements.txt || (cat /app/requirements.txt && exit 1)
 
 # Set environment variables
 ENV FLASK_APP=app.py

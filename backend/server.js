@@ -57,7 +57,7 @@ const logger = {
 
 // Initialize GROQ client
 const groqClient = axios.create({
-    baseURL: 'https://api.groq.com/v1',
+    baseURL: 'https://api.groq.com/openai/v1',
     headers: {
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json'
@@ -314,22 +314,35 @@ async function analyzeImageWithAI(imagePath, cropType, symptoms = []) {
             }
         }
 
-        const prompt = `Analyze this ${cropType} plant image with the following reported symptoms: ${symptoms.join(', ')}.
-        
-        Provide a detailed diagnosis in this exact JSON format:
-        {
-            "disease_name": "name of the detected disease",
-            "confidence": number between 0-100,
-            "symptoms_detected": ["list", "of", "visible", "symptoms"],
-            "severity": "mild/moderate/severe",
-            "recommendations": ["list", "of", "treatment", "steps"],
-            "preventive_measures": ["list", "of", "preventive", "measures"]
-        }`;
+        // Improved prompt for Groq Llama model with insights field
+        const prompt = `You are an expert agricultural pathologist. Analyze the following plant image for disease detection and severity assessment.
+
+Crop type: ${cropType}
+${symptoms && symptoms.length ? `Reported symptoms: ${symptoms.join(', ')}` : 'No specific symptoms reported.'}
+${typeof req !== 'undefined' && req.body && req.body.plantAge ? `Plant age: ${req.body.plantAge} weeks.` : ''}
+${typeof req !== 'undefined' && req.body && req.body.notes ? `Additional notes: ${req.body.notes}` : ''}
+
+Instructions:
+- Carefully examine the image and provided information.
+- Identify the most likely disease (if any), its severity, and visible symptoms.
+- Suggest immediate treatment and preventive measures.
+- If the plant appears healthy, state so clearly.
+- Include a field "insights" with a concise summary of your reasoning or any additional observations.
+- Respond ONLY in the following JSON format:
+{
+  "disease_name": "name of the detected disease or 'Healthy'",
+  "confidence": number between 0-100,
+  "symptoms_detected": ["list", "of", "visible", "symptoms"],
+  "severity": "mild/moderate/severe/none",
+  "recommendations": ["list", "of", "treatment", "steps"],
+  "preventive_measures": ["list", "of", "preventive", "measures"],
+  "insights": "..."
+}`;
 
         logger.info('Sending request to GROQ API', { prompt });
 
         const response = await groqClient.post('/chat/completions', {
-            model: 'mixtral-8x7b-32768',
+            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
             messages: [
                 {
                     role: 'system',
@@ -361,12 +374,20 @@ async function analyzeImageWithAI(imagePath, cropType, symptoms = []) {
             throw new Error('Invalid response format from GROQ API');
         }
 
-        const aiAnalysis = JSON.parse(response.data.choices[0].message.content);
+        let content = response.data.choices[0].message.content.trim();
+        // Remove code block markers if present
+        if (content.startsWith('```')) {
+            content = content.replace(/^```(\w+)?/, '').replace(/```$/, '').trim();
+        }
+        const aiAnalysis = JSON.parse(content);
         logger.success('AI Analysis Result', aiAnalysis);
         return aiAnalysis;
 
     } catch (error) {
         logger.error('AI Analysis Failed', error);
+        if (error.response) {
+            logger.error('GROQ API Error Response', error.response.data);
+        }
         return null;
     }
 }
@@ -522,25 +543,26 @@ app.post('/api/diagnose', upload.array('images', 5), async (req, res) => {
             }
         }
 
-        // Try AI analysis if we have valid inputs and API key
-        if (symptoms.length > 0 && process.env.GROQ_API_KEY) {
+        // Always try AI analysis if GROQ_API_KEY is set
+        if (process.env.GROQ_API_KEY) {
+            logger.info('AI path: GROQ_API_KEY is set, entering AI analysis block.');
             try {
                 logger.info('Starting AI Analysis Pipeline');
-                
                 const aiResults = [];
                 for (const file of req.files) {
+                    logger.info(`Calling analyzeImageWithAI for file: ${file.path}`);
                     const aiAnalysis = await analyzeImageWithAI(file.path, cropType, symptoms);
                     if (aiAnalysis) {
                         aiResults.push(aiAnalysis);
+                    } else {
+                        logger.error('AI analysis returned null or invalid response for file:', file.path);
                     }
                 }
-
                 if (aiResults.length > 0) {
                     logger.success('AI Analysis Successful');
                     const bestResult = aiResults.reduce((best, current) => {
                         return (!best || current.confidence > best.confidence) ? current : best;
                     });
-
                     const response = {
                         status: 'disease_detected',
                         disease: bestResult.disease_name,
@@ -550,22 +572,28 @@ app.post('/api/diagnose', upload.array('images', 5), async (req, res) => {
                         recommendations: bestResult.recommendations,
                         preventive_measures: bestResult.preventive_measures,
                         analysis_method: 'ai',
-                        details: `AI-based analysis of ${req.files.length} images. ` +
+                        details: bestResult.insights || `AI-based analysis of ${req.files.length} images. ` +
                                 `Plant age: ${plantAge || 'unknown'} weeks. ` +
-                                `Reported symptoms: ${symptoms.join(', ')}`
+                                `Reported symptoms: ${symptoms && symptoms.length ? symptoms.join(', ') : 'None'}`
                     };
-
                     // Clean up files
                     await Promise.all(req.files.map(file => fs.unlink(file.path)));
-                    
                     logger.success('Final Response', response);
                     logger.endRequest();
                     return res.json(response);
+                } else {
+                    logger.error('AI path: No valid AI results, falling back to color-based analysis.');
                 }
             } catch (error) {
                 logger.error('AI Analysis Pipeline Failed', error);
+                if (error.response) {
+                    logger.error('GROQ API Error Response', error.response.data);
+                }
+                logger.error('AI path: Exception thrown, falling back to color-based analysis.');
                 // Continue to fallback analysis
             }
+        } else {
+            logger.info('AI path: GROQ_API_KEY not set, skipping AI analysis.');
         }
 
         // Fallback to enhanced color analysis

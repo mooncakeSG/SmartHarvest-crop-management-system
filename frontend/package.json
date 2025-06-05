@@ -1,0 +1,17 @@
+{
+  "name": "smartharvest-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for SmartHarvest crop management system",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.1.4"
+  }
+} 

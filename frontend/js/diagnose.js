@@ -112,7 +112,7 @@ const a11y = {
 
         // Update additional insights
         const insights = document.getElementById('additional-insights');
-        insights.textContent = results.details;
+        insights.textContent = results.insights || results.details;
         
         this.announce('Analysis complete. Results are now available.');
     },
@@ -239,7 +239,7 @@ class CropDiagnosis {
 
         this.uploadedImages.push(...validFiles);
         this.updateImagePreview();
-        
+
         const fileCount = this.uploadedImages.length;
         a11y.announce(`${fileCount} ${fileCount === 1 ? 'image' : 'images'} uploaded successfully.`);
     }
@@ -253,20 +253,20 @@ class CropDiagnosis {
             reader.onload = (e) => {
                 const preview = document.createElement('div');
                 preview.className = 'relative';
-                
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.className = 'w-full h-48 object-cover rounded-lg';
                 img.alt = `Preview of uploaded image ${index + 1}`;
                 img.setAttribute('role', 'img');
-                
+
                 const removeButton = document.createElement('button');
                 removeButton.type = 'button';
                 removeButton.className = 'absolute top-2 right-2 bg-red-500 text-white rounded-full p-2';
                 removeButton.setAttribute('aria-label', `Remove image ${index + 1}`);
                 removeButton.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
                 removeButton.addEventListener('click', () => this.removeImage(index));
-                
+
                 preview.appendChild(img);
                 preview.appendChild(removeButton);
                 this.imagePreview.appendChild(preview);
@@ -301,12 +301,12 @@ class CropDiagnosis {
             this.uploadedImages.forEach(file => formData.append('images', file));
             formData.append('cropType', cropType);
             formData.append('plantAge', document.getElementById('plant-age').value);
-            
+
             // Get selected symptoms
             const symptoms = Array.from(document.querySelectorAll('.symptom-checkbox:checked'))
                 .map(checkbox => checkbox.nextElementSibling.textContent);
             formData.append('symptoms', JSON.stringify(symptoms));
-            
+
             // Add notes
             formData.append('notes', document.getElementById('notes').value);
 
@@ -345,11 +345,11 @@ class CropDiagnosis {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     new CropDiagnosis();
-    
+
     // Add skip to main content link
     const skipLink = document.createElement('a');
     skipLink.href = '#main';
     skipLink.className = 'skip-to-main';
     skipLink.textContent = 'Skip to main content';
     document.body.insertBefore(skipLink, document.body.firstChild);
-}); 
+});

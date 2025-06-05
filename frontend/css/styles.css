@@ -1,253 +1,229 @@
-/* Reset and Base Styles */
-* {
-    margin: 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Accessibility-focused styles */
+:root {
+    --focus-ring-color: #10B981;
+    --focus-ring-offset: 2px;
+}
+
+/* High contrast focus styles */
+*:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Skip to main content link */
+.skip-to-main {
+    position: absolute;
+    top: -9999px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 1rem;
+    z-index: 9999;
+    transition: top 0.3s;
+}
+
+.skip-to-main:focus {
+    top: 0;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
     padding: 0;
-    box-sizing: border-box;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f6fa;
-    color: #2d3436;
+/* Ensure sufficient color contrast */
+.text-gray-500 {
+    color: #6B7280; /* WCAG AA compliant */
 }
 
-/* Layout */
-.app-container {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    min-height: 100vh;
+.text-gray-700 {
+    color: #374151; /* WCAG AAA compliant */
 }
 
-/* Sidebar */
-.sidebar {
-    background-color: #2d3436;
-    color: white;
-    padding: 1.5rem;
+/* Focus visible utility */
+.focus-visible\:ring-2:focus-visible {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+/* Enhanced button focus states */
+button:focus,
+[role="button"]:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
 }
 
-.logo {
-    width: 40px;
-    height: 40px;
+/* Form control focus states */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    --tw-ring-color: var(--focus-ring-color);
 }
 
-.nav-links {
-    list-style: none;
+/* Checkbox and radio focus states */
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
 }
 
-.nav-links li {
-    margin-bottom: 0.5rem;
+/* Enhanced link focus states */
+a:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    text-decoration: underline;
 }
 
-.nav-links a {
-    color: #dfe6e9;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    transition: background-color 0.3s;
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
-.nav-links a:hover,
-.nav-links li.active a {
-    background-color: #636e72;
+/* Enhanced keyboard navigation indicators */
+[tabindex]:not([tabindex="-1"]):focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
 }
 
-/* Main Content */
-.main-content {
-    padding: 2rem;
+/* Ensure sufficient touch target sizes */
+button,
+[role="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
 }
 
-/* Top Navigation */
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.search-bar {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.search-bar input {
-    border: none;
-    outline: none;
-    margin-left: 0.5rem;
-    width: 300px;
-}
-
-.user-menu {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
-/* Dashboard */
-.dashboard h2 {
+/* Improved form field spacing for touch targets */
+.form-group {
     margin-bottom: 1.5rem;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+/* Enhanced error states */
+.error {
+    border-color: #DC2626;
+    background-color: #FEE2E2;
+    color: #991B1B;
 }
 
-.stat-card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.stat-card i {
-    font-size: 2rem;
-    color: #0984e3;
-    margin-bottom: 1rem;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #2d3436;
+.error-message {
+    color: #991B1B;
+    font-size: 0.875rem;
     margin-top: 0.5rem;
 }
 
-/* Recent Activity */
-.recent-activity {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Loading states */
+[aria-busy="true"] {
+    cursor: progress;
 }
 
-.activity-list {
-    margin-top: 1rem;
+/* Disabled states */
+[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
-/* Chat Widget */
-.chat-widget {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 350px;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    flex-direction: column;
-    height: 500px;
+/* Custom focus styles for interactive elements */
+.custom-focus {
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
 }
 
-.chat-header {
-    padding: 1rem;
-    background-color: #0984e3;
-    color: white;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Ensure sufficient spacing between interactive elements */
+.interactive-spacing > * + * {
+    margin-top: 0.75rem;
 }
 
-.minimize-btn {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
+/* Enhanced visibility for current/active states */
+[aria-current="page"],
+[aria-current="step"],
+[aria-current="location"],
+[aria-current="date"],
+[aria-current="time"] {
+    font-weight: bold;
+    text-decoration: underline;
 }
 
-.chat-messages {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
+/* Improved contrast for placeholder text */
+::placeholder {
+    color: #6B7280;
+    opacity: 1;
 }
 
-.message {
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    max-width: 80%;
+/* Enhanced focus styles for form elements */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+.form-multiselect:focus {
+    @apply ring-2 ring-green-500 ring-offset-2 border-green-500;
 }
 
-.message.bot {
-    background-color: #f1f2f6;
-    margin-right: auto;
+/* Ensure sufficient contrast for disabled text */
+[disabled] {
+    color: #6B7280;
 }
 
-.message.user {
-    background-color: #0984e3;
-    color: white;
-    margin-left: auto;
+/* Enhanced visibility for required fields */
+[aria-required="true"]::after {
+    content: "*";
+    color: #DC2626;
+    margin-left: 0.25rem;
 }
 
-.chat-input {
-    padding: 1rem;
-    border-top: 1px solid #dfe6e9;
-    display: flex;
-    gap: 0.5rem;
+/* Improved focus visibility for dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --focus-ring-color: #34D399;
+    }
 }
 
-.chat-input input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #dfe6e9;
-    border-radius: 4px;
-    outline: none;
-}
-
-.send-btn,
-.upload-btn {
-    background-color: #0984e3;
-    color: white;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.upload-btn {
-    background-color: #00b894;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .app-container {
-        grid-template-columns: 1fr;
+/* Animation control based on user preference */
+@media (prefers-reduced-motion: no-preference) {
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in-out;
     }
 
-    .sidebar {
-        display: none;
+    .animate-slide-in {
+        animation: slideIn 0.3s ease-out;
     }
 
-    .chat-widget {
-        width: 100%;
-        height: 100%;
-        bottom: 0;
-        right: 0;
-        border-radius: 0;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(10px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 } 

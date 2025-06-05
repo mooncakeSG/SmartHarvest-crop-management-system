@@ -1,123 +1,87 @@
-# SmartHarvest - AI-Powered Crop Management System
+# SmartHarvest - Crop Management System
 
-## Project Overview
-SmartHarvest is an AI-powered crop management system designed to help farmers optimize their agricultural practices through intelligent monitoring, analysis, and recommendations.
+A modern web application for crop disease diagnosis and management using image analysis.
 
-## AI Applications in Agriculture
-1. **Crop Disease Detection**
-   - Uses image recognition to identify plant diseases
-   - Provides immediate treatment recommendations
-   - Reduces crop loss by up to 30%
+## Features
 
-2. **Yield Prediction**
-   - Analyzes historical data and current conditions
-   - Predicts crop yields with 85% accuracy
-   - Helps in resource planning and market preparation
+- Image-based crop disease diagnosis
+- Real-time analysis and recommendations
+- Comprehensive crop health monitoring
+- User-friendly interface with drag-and-drop functionality
+- Detailed diagnosis reports with confidence scores
 
-3. **Smart Irrigation**
-   - Monitors soil moisture and weather conditions
-   - Optimizes water usage
-   - Reduces water consumption by 40%
+## Setup
 
-## Problem Statement
-Farmers face significant challenges in:
-- Early disease detection
-- Resource optimization
-- Yield prediction
-- Weather impact management
+### Prerequisites
 
-**Impact Metrics:**
-- 30% reduction in crop loss
-- 40% reduction in water usage
-- 25% increase in yield
-- 50% reduction in manual monitoring time
+- Node.js (v14 or higher)
+- npm (v6 or higher)
 
-## Technical Architecture
+### Installation
 
-### Data Flow Diagram
-```
-[User Input] → [Frontend Interface] → [AI Processing] → [Results Display]
-     ↑              ↓                      ↓                ↓
-     └──────────────┴──────────────────────┴────────────────┘
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/SmartHarvest-crop-management-system.git
+cd SmartHarvest-crop-management-system
 ```
 
-### Components
-1. **Data Input Mechanisms**
-   - Image upload for disease detection
-   - Manual data entry for crop details
-   - Weather API integration
-   - Soil sensor data integration
+2. Install frontend dependencies:
+```bash
+npm install
+```
 
-2. **AI Processing**
-   - Image classification for disease detection
-   - Predictive analytics for yield forecasting
-   - Natural language processing for chatbot assistance
+3. Install backend dependencies:
+```bash
+cd backend
+npm install
+```
 
-3. **Output Presentation**
-   - Interactive dashboard
-   - Real-time alerts
-   - Visual data representation
-   - AI-powered recommendations
+### Running the Application
 
-### API Connections
-1. **Weather API**
-   - Provider: OpenWeatherMap
-   - Purpose: Real-time weather data
-   - Integration: REST API
+1. Start the backend server (from the backend directory):
+```bash
+npm run dev
+```
+The backend will run on http://localhost:3000
 
-2. **Plant Disease API**
-   - Provider: Plant.id
-   - Purpose: Disease identification
-   - Integration: REST API
+2. Start the frontend development server (from the root directory):
+```bash
+npm run dev
+```
+The frontend will run on http://localhost:5173
 
-3. **Chatbot API**
-   - Provider: OpenAI
-   - Purpose: Natural language processing
-   - Integration: REST API
+## Usage
 
-## User Interaction Touchpoints
-1. **Dashboard Interface**
-   - Crop monitoring
-   - Disease detection
-   - Yield prediction
-   - Resource management
+1. Navigate to http://localhost:5173 in your web browser
+2. Select the "Diagnose Crop" option from the sidebar
+3. Upload images of your crops (supports JPG and PNG formats)
+4. Fill in the required information about your crop
+5. Click "Start AI Diagnosis" to receive analysis results
 
-2. **AI Assistant**
-   - Natural language queries
-   - Image analysis
-   - Expert recommendations
-   - Weather updates
+## Technical Details
 
-## Error Handling
-1. **Input Validation**
-   - Image format verification
-   - Data type checking
-   - Required field validation
+### Frontend
+- Vite + JavaScript
+- Modern UI with Tailwind CSS
+- Real-time image processing
+- Interactive data visualization with Chart.js
 
-2. **API Error Handling**
-   - Connection timeouts
-   - Rate limiting
-   - Invalid responses
+### Backend
+- Node.js + Express
+- Image processing with Sharp
+- File handling with Multer
+- Color-based disease detection algorithm
 
-3. **User Feedback**
-   - Clear error messages
-   - Recovery suggestions
-   - Fallback options
+## Development
 
-## Getting Started
-1. Clone the repository
-2. Install dependencies
-3. Set up API keys
-4. Run the application
+The application uses a mock AI system for demonstration purposes. The disease detection is based on color analysis and predefined patterns. In a production environment, this would be replaced with a more sophisticated machine learning model.
 
-## Future Enhancements
-1. Mobile application
-2. Offline functionality
-3. Multi-language support
-4. Advanced analytics
-
-## Team Members
-- Keawin Koesnel
+### Mock AI Features
+- Color pattern analysis for disease detection
+- Confidence score calculation
+- Predefined disease database
+- Simulated processing time for realistic behavior
 
 ## License
-MIT License
+
+MIT License - feel free to use this code for your own projects.

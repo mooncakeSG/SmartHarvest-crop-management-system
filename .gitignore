@@ -49,4 +49,30 @@ yarn-error.log*
 
 # Build files
 dist/
-build/ 
+build/
+
+# Dependencies
+/dist
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Environment files
+.env.development.local
+.env.test.local
+.env.production.local
+
+# System Files
+Thumbs.db
+
+# Uploaded files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Generated files
+frontend/css/tailwind.css 

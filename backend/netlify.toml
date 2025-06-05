@@ -1,7 +1,7 @@
 [build]
-  command = "cd backend && npm install"
-  publish = "backend"
-  functions = "backend/functions"
+  command = "npm install"
+  publish = "."
+  functions = "functions"
 
 [functions]
   node_bundler = "esbuild"

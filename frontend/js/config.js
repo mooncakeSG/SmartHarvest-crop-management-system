@@ -3,7 +3,7 @@ const config = {
     // API Configuration
     api: {
         groq: {
-            endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+            endpoint: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/diagnose',
             apiKey: 'your_groq_api_key_here',
             model: 'meta-llama/llama-4-scout-17b-16e-instruct'
         }

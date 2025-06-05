@@ -329,15 +329,15 @@ Instructions:
 - If the plant appears healthy, state so clearly.
 - Include a field "insights" with a concise summary of your reasoning or any additional observations.
 - Respond ONLY in the following JSON format:
-{
+        {
   "disease_name": "name of the detected disease or 'Healthy'",
-  "confidence": number between 0-100,
-  "symptoms_detected": ["list", "of", "visible", "symptoms"],
+            "confidence": number between 0-100,
+            "symptoms_detected": ["list", "of", "visible", "symptoms"],
   "severity": "mild/moderate/severe/none",
-  "recommendations": ["list", "of", "treatment", "steps"],
+            "recommendations": ["list", "of", "treatment", "steps"],
   "preventive_measures": ["list", "of", "preventive", "measures"],
   "insights": "..."
-}`;
+        }`;
 
         logger.info('Sending request to GROQ API', { prompt });
 

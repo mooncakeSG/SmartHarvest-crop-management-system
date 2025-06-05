@@ -232,14 +232,13 @@ class CropDiagnosis {
             return true;
         });
 
-        if (this.uploadedImages.length + validFiles.length > this.maxImages) {
-            a11y.announce(`You can only upload a maximum of ${this.maxImages} images.`);
-            return;
+        // Only allow one image at a time
+        if (validFiles.length > 0) {
+            this.uploadedImages = [validFiles[0]];
+        } else {
+            this.uploadedImages = [];
         }
-
-        this.uploadedImages.push(...validFiles);
         this.updateImagePreview();
-        
         const fileCount = this.uploadedImages.length;
         a11y.announce(`${fileCount} ${fileCount === 1 ? 'image' : 'images'} uploaded successfully.`);
     }
@@ -298,15 +297,14 @@ class CropDiagnosis {
 
         try {
             const formData = new FormData();
-            this.uploadedImages.forEach(file => formData.append('images', file));
+            // Only send one image as 'image'
+            formData.append('image', this.uploadedImages[0]);
             formData.append('cropType', cropType);
             formData.append('plantAge', document.getElementById('plant-age').value);
-            
             // Get selected symptoms
             const symptoms = Array.from(document.querySelectorAll('.symptom-checkbox:checked'))
                 .map(checkbox => checkbox.nextElementSibling.textContent);
             formData.append('symptoms', JSON.stringify(symptoms));
-            
             // Add notes
             formData.append('notes', document.getElementById('notes').value);
 

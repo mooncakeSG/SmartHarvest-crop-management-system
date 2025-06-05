@@ -122,4 +122,6 @@ app.get('/api/health', (req, res) => {
 });
 
 // Export the serverless handler
-module.exports.handler = serverless(app); 
+module.exports.handler = serverless(app, {
+  basePath: '/.netlify/functions/server'
+}); 

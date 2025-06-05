@@ -369,30 +369,134 @@ async function analyzeImage(imageBuffer, cropType) {
     }
 }
 
-// API Routes
+// Helper function to encode image buffer to base64
+async function imageToBase64Buffer(imageBuffer) {
+    return imageBuffer.toString('base64');
+}
+
+// AI Analysis function for buffer
+async function analyzeImageWithAIFromBuffer(imageBuffer, cropType, symptoms = [], plantAge = '', notes = '') {
+    logger.info('Starting AI Analysis', {
+        cropType,
+        symptoms
+    });
+
+    try {
+        const base64Image = await imageToBase64Buffer(imageBuffer);
+        logger.info('Image converted to base64');
+
+        // Ensure symptoms is an array
+        if (typeof symptoms === 'string') {
+            try {
+                symptoms = JSON.parse(symptoms);
+            } catch (err) {
+                logger.error('Invalid symptoms format', err);
+                symptoms = [];
+            }
+        }
+
+        // Improved prompt for Groq Llama model with insights field
+        const prompt = `You are an expert agricultural pathologist. Analyze the following plant image for disease detection and severity assessment.\n\nCrop type: ${cropType}\n${symptoms && symptoms.length ? `Reported symptoms: ${symptoms.join(', ')}` : 'No specific symptoms reported.'}\n${plantAge ? `Plant age: ${plantAge} weeks.` : ''}\n${notes ? `Additional notes: ${notes}` : ''}\n\nInstructions:\n- Carefully examine the image and provided information.\n- Identify the most likely disease (if any), its severity, and visible symptoms.\n- Suggest immediate treatment and preventive measures.\n- If the plant appears healthy, state so clearly.\n- Include a field \"insights\" with a concise summary of your reasoning or any additional observations.\n- Respond ONLY in the following JSON format:\n        {\n  \"disease_name\": \"name of the detected disease or 'Healthy'\",\n            \"confidence\": number between 0-100,\n            \"symptoms_detected\": [\"list\", \"of\", \"visible\", \"symptoms\"],\n  \"severity\": \"mild/moderate/severe/none\",\n            \"recommendations\": [\"list\", \"of\", \"treatment\", \"steps\"],\n  \"preventive_measures\": [\"list\", \"of\", \"preventive\", \"measures\"],\n  \"insights\": \"...\"\n        }`;
+
+        logger.info('Sending request to GROQ API', { prompt });
+
+        const response = await groqClient.post('/chat/completions', {
+            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are an expert agricultural pathologist. Analyze the image and symptoms to diagnose crop diseases.'
+                },
+                {
+                    role: 'user',
+                    content: [
+                        {
+                            type: 'text',
+                            text: prompt
+                        },
+                        {
+                            type: 'image_url',
+                            image_url: {
+                                url: `data:image/jpeg;base64,${base64Image}`
+                            }
+                        }
+                    ]
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: 500
+        });
+
+        logger.success('GROQ API Response Received', response.data);
+
+        if (!response.data.choices || !response.data.choices[0]) {
+            throw new Error('Invalid response format from GROQ API');
+        }
+
+        let content = response.data.choices[0].message.content.trim();
+        // Remove code block markers if present
+        if (content.startsWith('```')) {
+            content = content.replace(/^```(\\w+)?/, '').replace(/```$/, '').trim();
+        }
+        const aiAnalysis = JSON.parse(content);
+        logger.success('AI Analysis Result', aiAnalysis);
+        return aiAnalysis;
+
+    } catch (error) {
+        logger.error('AI Analysis Failed', error);
+        if (error.response) {
+            logger.error('GROQ API Error Response', error.response.data);
+        }
+        return null;
+    }
+}
+
+// Update /api/diagnose route to use AI if available
 app.post('/api/diagnose', upload.single('image'), async (req, res) => {
     try {
         logger.startRequest();
-        
         if (!req.file) {
             throw new Error('No image file provided');
         }
-
         const cropType = req.body.cropType || 'tomato';
-        
-        // Process the image
-        const imageBuffer = req.file.buffer;
-        const processedImage = await sharp(imageBuffer)
-            .resize(800, 600, { fit: 'inside' })
-            .toBuffer();
+        const plantAge = req.body.plantAge || '';
+        const notes = req.body.notes || '';
+        let symptoms = req.body.symptoms || [];
 
-        // Analyze the image
-        const analysis = await analyzeImage(processedImage, cropType);
-        
+        // Try AI path if GROQ_API_KEY is set
+        let aiResult = null;
+        if (process.env.GROQ_API_KEY) {
+            aiResult = await analyzeImageWithAIFromBuffer(req.file.buffer, cropType, symptoms, plantAge, notes);
+        }
+        if (aiResult && aiResult.recommendations) {
+            // Return AI result in expected format
+            logger.success('Analysis complete', aiResult);
+            logger.endRequest();
+            return res.json({
+                disease: aiResult.disease_name,
+                confidence: aiResult.confidence,
+                recommendations: aiResult.recommendations,
+                insights: aiResult.insights,
+                severity: aiResult.severity,
+                symptoms: aiResult.symptoms_detected,
+                preventive_measures: aiResult.preventive_measures,
+                analysis_method: 'ai'
+            });
+        }
+        // Fallback to color-based analysis
+        const analysis = await analyzeImage(req.file.buffer, cropType);
         logger.success('Analysis complete', analysis);
         logger.endRequest();
-        
-        res.json(analysis);
+        return res.json({
+            disease: analysis?.disease || 'Healthy',
+            confidence: analysis?.confidence || 100,
+            recommendations: analysis?.data?.recommendations || [],
+            insights: '',
+            severity: '',
+            symptoms: analysis?.data?.symptoms || [],
+            preventive_measures: [],
+            analysis_method: 'color'
+        });
     } catch (error) {
         logger.error('Diagnosis failed', error);
         res.status(500).json({ error: error.message });

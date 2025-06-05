@@ -86,7 +86,40 @@ const upload = multer({
     }
 });
 
-// Your existing routes and middleware here...
+// API Routes
+app.post('/api/diagnose', upload.single('image'), async (req, res) => {
+    try {
+        logger.startRequest();
+        
+        if (!req.file) {
+            throw new Error('No image file provided');
+        }
+
+        const cropType = req.body.cropType || 'tomato';
+        
+        // Process the image
+        const imageBuffer = req.file.buffer;
+        const processedImage = await sharp(imageBuffer)
+            .resize(800, 600, { fit: 'inside' })
+            .toBuffer();
+
+        // Analyze the image
+        const analysis = await analyzeImage(processedImage, cropType);
+        
+        logger.success('Analysis complete', analysis);
+        logger.endRequest();
+        
+        res.json(analysis);
+    } catch (error) {
+        logger.error('Diagnosis failed', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
 
 // Export the serverless handler
 module.exports.handler = serverless(app); 

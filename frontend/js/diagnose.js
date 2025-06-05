@@ -310,7 +310,7 @@ class CropDiagnosis {
             // Add notes
             formData.append('notes', document.getElementById('notes').value);
 
-            const response = await fetch('/api/diagnose', {
+            const response = await fetch(config.api.groq.endpoint, {
                 method: 'POST',
                 body: formData
             });

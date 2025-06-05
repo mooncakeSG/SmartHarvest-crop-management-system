@@ -1,7 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
     content: [
         "./index.html",
+        "./about.html",
+        "./contact.html",
+        "./dashboard.html",
+        "./chatbot.html",
         "./js/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
@@ -83,11 +87,7 @@ module.exports = {
             },
         },
     },
-    plugins: [
-        require('@tailwindcss/forms')({
-            strategy: 'class',
-        }),
-    ],
+    plugins: [],
     future: {
         hoverOnlyWhenSupported: true,
     },

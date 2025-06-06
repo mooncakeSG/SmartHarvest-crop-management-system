@@ -42,6 +42,22 @@ class AIService {
         }
     }
 
+    // Add compatibility method for existing code
+    static async analyzeCropImage(imageData, cropType, symptoms = []) {
+        try {
+            const result = await this.analyzeImage(imageData);
+            return {
+                ...result,
+                cropType,
+                reportedSymptoms: symptoms,
+                analysis_method: 'ai'
+            };
+        } catch (error) {
+            console.error('Crop Analysis Error:', error);
+            throw error;
+        }
+    }
+
     static validateAnalysisResult(result) {
         return {
             isValid: Boolean(

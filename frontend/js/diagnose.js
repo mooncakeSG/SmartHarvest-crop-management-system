@@ -283,50 +283,47 @@ class CropDiagnosis {
 
     async startDiagnosis() {
         if (this.isAnalyzing || this.uploadedImages.length === 0) {
-            a11y.announce('Please upload at least one image before starting the diagnosis.');
             return;
         }
-
-        const cropType = document.getElementById('crop-type').value;
-        if (!cropType) {
-            a11y.announce('Please select a crop type before starting the diagnosis.');
-            return;
-        }
-
-        this.isAnalyzing = true;
-        a11y.setLoading(true);
 
         try {
-            // Get selected symptoms
-            const symptoms = Array.from(document.querySelectorAll('.symptom-checkbox:checked'))
-                .map(checkbox => checkbox.nextElementSibling.textContent);
+            this.isAnalyzing = true;
+            a11y.setLoading(true);
 
-            // Process each image
-            const results = await Promise.all(this.uploadedImages.map(async (file) => {
-                try {
-                    // Convert image to base64
-                    const base64Image = await this.fileToBase64(file);
-                    
-                    // Try AI analysis first
-                    try {
-                        const aiResult = await aiService.analyzeCropImage(base64Image, cropType, symptoms);
-                        return aiResult;
-                    } catch (aiError) {
-                        console.warn('AI analysis failed, falling back to color analysis:', aiError);
-                        // Fall back to color analysis
-                        return this.performColorAnalysis(file, cropType, symptoms);
-                    }
-                } catch (error) {
-                    console.error('Image processing error:', error);
-                    throw error;
+            const cropType = document.getElementById('crop-type').value;
+            const symptoms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Convert image to base64
+            const imageData = await this.fileToBase64(this.uploadedImages[0]);
+
+            try {
+                // Try AI analysis first
+                const aiResult = await aiService.analyzeCropImage(imageData, cropType, symptoms);
+                
+                if (aiResult && aiResult.disease) {
+                    // Update UI with AI results
+                    a11y.updateResults({
+                        disease: aiResult.disease,
+                        confidence: aiResult.confidence,
+                        recommendations: aiResult.data.recommendations,
+                        symptoms: aiResult.data.symptoms,
+                        details: `Analysis completed using AI. Detected ${aiResult.disease} with ${aiResult.confidence}% confidence.`
+                    });
+                    return;
                 }
-            }));
-
-            // Combine and average results if multiple images
-            const combinedResult = this.combineResults(results);
-            
-            // Update UI with results
-            this.updateResults(combinedResult);
+            } catch (aiError) {
+                console.error('AI analysis failed:', aiError);
+                // Fall back to color analysis
+                const colorResult = await this.performColorAnalysis(this.uploadedImages[0], cropType, symptoms);
+                a11y.updateResults({
+                    disease: colorResult.disease,
+                    confidence: colorResult.confidence,
+                    recommendations: colorResult.recommendations,
+                    symptoms: colorResult.symptoms,
+                    details: 'Analysis completed using color analysis due to AI service unavailability.'
+                });
+            }
 
         } catch (error) {
             console.error('Diagnosis error:', error);
@@ -364,46 +361,6 @@ class CropDiagnosis {
         }
 
         return await response.json();
-    }
-
-    combineResults(results) {
-        if (results.length === 1) return results[0];
-
-        // Combine multiple results
-        const combined = {
-            disease: this.getMostCommonDisease(results),
-            confidence: this.getAverageConfidence(results),
-            symptoms: this.getAllSymptoms(results),
-            recommendations: this.getAllRecommendations(results),
-            analysis_method: results.some(r => r.analysis_method === 'ai') ? 'hybrid' : 'color',
-            details: `Analysis of ${results.length} images completed.`
-        };
-
-        return combined;
-    }
-
-    getMostCommonDisease(results) {
-        const diseases = results.map(r => r.disease);
-        return this.getMostFrequent(diseases);
-    }
-
-    getAverageConfidence(results) {
-        const sum = results.reduce((acc, r) => acc + r.confidence, 0);
-        return Math.round(sum / results.length);
-    }
-
-    getAllSymptoms(results) {
-        return [...new Set(results.flatMap(r => r.symptoms))];
-    }
-
-    getAllRecommendations(results) {
-        return [...new Set(results.flatMap(r => r.recommendations))];
-    }
-
-    getMostFrequent(arr) {
-        return arr.sort((a,b) =>
-            arr.filter(v => v === a).length - arr.filter(v => v === b).length
-        ).pop();
     }
 
     clearForm() {

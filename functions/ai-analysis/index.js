@@ -31,10 +31,24 @@ async function analyzeImage(imageData, context) {
         }
 
         const rawData = await response.text();
-        let parsedData;
+        console.log('Raw API Response:', rawData); // Debug log
         
+        let parsedData;
         try {
+            // First try to parse the raw response
             parsedData = JSON.parse(rawData);
+            
+            // If the response contains choices array (Groq API format)
+            if (parsedData.choices && parsedData.choices[0] && parsedData.choices[0].message) {
+                const messageContent = parsedData.choices[0].message.content;
+                try {
+                    // Parse the actual content from the message
+                    parsedData = JSON.parse(messageContent);
+                } catch (contentParseError) {
+                    console.error('Failed to parse message content:', messageContent);
+                    throw new Error('Invalid JSON in AI response content');
+                }
+            }
         } catch (parseError) {
             console.error('Failed to parse AI response:', rawData);
             throw new Error('Invalid JSON response from AI service');
@@ -63,6 +77,7 @@ async function analyzeImage(imageData, context) {
         };
 
     } catch (error) {
+        console.error('Analysis Error:', error); // Debug log
         return handleAPIError(error, {
             requestId: context.requestId,
             service: 'AI Analysis'

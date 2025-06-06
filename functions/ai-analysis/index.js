@@ -30,31 +30,28 @@ async function analyzeImage(imageData, context) {
             throw new Error(`API request failed with status ${response.status}`);
         }
 
-        const rawData = await response.text();
-        console.log('Raw API Response:', rawData); // Debug log
-        
-        let parsedData;
-        try {
-            // First try to parse the raw response
-            parsedData = JSON.parse(rawData);
-            
-            // If the response contains choices array (Groq API format)
-            if (parsedData.choices && parsedData.choices[0] && parsedData.choices[0].message) {
-                const messageContent = parsedData.choices[0].message.content;
-                try {
-                    // Parse the actual content from the message
-                    parsedData = JSON.parse(messageContent);
-                } catch (contentParseError) {
-                    console.error('Failed to parse message content:', messageContent);
-                    throw new Error('Invalid JSON in AI response content');
-                }
-            }
-        } catch (parseError) {
-            console.error('Failed to parse AI response:', rawData);
-            throw new Error('Invalid JSON response from AI service');
+        // First get the response as JSON directly
+        const groqResponse = await response.json();
+        console.log('Groq API Response:', JSON.stringify(groqResponse, null, 2));
+
+        // Extract the content from the message
+        const messageContent = groqResponse.choices?.[0]?.message?.content;
+        if (!messageContent) {
+            throw new Error('Invalid response structure from Groq API');
         }
 
-        // Ensure the response matches our expected format
+        // Try to parse the content if it's a string, otherwise use it directly
+        let parsedData;
+        try {
+            parsedData = typeof messageContent === 'string' 
+                ? JSON.parse(messageContent) 
+                : messageContent;
+        } catch (parseError) {
+            console.error('Failed to parse message content:', messageContent);
+            throw new Error('Invalid JSON in AI response content');
+        }
+
+        // Create the formatted response
         const formattedResponse = {
             disease: parsedData.disease || "Unknown",
             confidence: parseFloat(parsedData.confidence) || 0,
@@ -62,10 +59,13 @@ async function analyzeImage(imageData, context) {
                 name: parsedData.disease || "Unknown",
                 confidence_threshold: 0.7,
                 color_ranges: parsedData.color_ranges || {},
-                recommendations: parsedData.recommendations || [],
-                symptoms: parsedData.symptoms || []
+                recommendations: Array.isArray(parsedData.recommendations) ? parsedData.recommendations : [],
+                symptoms: Array.isArray(parsedData.symptoms) ? parsedData.symptoms : []
             }
         };
+
+        // Log the final formatted response
+        console.log('Formatted Response:', JSON.stringify(formattedResponse, null, 2));
 
         return {
             statusCode: 200,
@@ -77,7 +77,11 @@ async function analyzeImage(imageData, context) {
         };
 
     } catch (error) {
-        console.error('Analysis Error:', error); // Debug log
+        console.error('Analysis Error:', {
+            message: error.message,
+            stack: error.stack,
+            context: context
+        });
         return handleAPIError(error, {
             requestId: context.requestId,
             service: 'AI Analysis'
@@ -95,6 +99,12 @@ exports.handler = async (event, context) => {
 
     try {
         const data = JSON.parse(event.body);
+        if (!data.image) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Image data is required' })
+            };
+        }
         return await analyzeImage(data.image, context);
     } catch (error) {
         return handleAPIError(error, {

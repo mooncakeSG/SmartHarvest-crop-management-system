@@ -369,27 +369,56 @@ class CropDiagnosis {
             formData.append('plantAge', document.getElementById('plant-age').value || '');
             formData.append('symptoms', JSON.stringify(symptoms));
             formData.append('notes', document.getElementById('notes').value || '');
+            formData.append('timestamp', new Date().toISOString());
 
             console.log('Calling color analysis endpoint:', endpoint);
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Origin': 'https://smartharvestfrontend.netlify.app'
+                    'Origin': 'https://smartharvestfrontend.netlify.app',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Accept'
                 },
+                mode: 'cors',
+                credentials: 'omit',
                 body: formData
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                const errorText = await response.text();
+                console.error('Raw color analysis error response:', errorText);
+                
+                let errorData;
+                try {
+                    errorData = JSON.parse(errorText);
+                } catch (e) {
+                    errorData = { error: errorText || response.statusText || 'Unknown error' };
+                }
+                
                 console.error('Color analysis error:', errorData);
                 throw new Error(errorData.error || `Failed to analyze image: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            console.log('Color analysis result:', result);
+            const rawResponse = await response.text();
+            console.log('Raw color analysis response:', rawResponse);
+
+            let result;
+            try {
+                result = JSON.parse(rawResponse);
+            } catch (e) {
+                console.error('Failed to parse color analysis response:', rawResponse);
+                throw new Error('Invalid JSON response from color analysis service');
+            }
+
+            console.log('Parsed color analysis result:', result);
 
             // Ensure the response has the required fields
+            if (!result.disease) {
+                throw new Error('Invalid response format: missing disease information');
+            }
+
             return {
                 disease: result.disease || 'Unknown',
                 confidence: result.confidence || 0,

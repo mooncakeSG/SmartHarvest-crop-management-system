@@ -11,22 +11,47 @@ class AIService {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Origin': 'https://smartharvestfrontend.netlify.app'
+                    'Origin': 'https://smartharvestfrontend.netlify.app',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Accept'
                 },
+                mode: 'cors',
+                credentials: 'omit',
                 body: JSON.stringify({ 
                     image: imageData,
-                    model: config.api.groq.model
+                    model: config.api.groq.model,
+                    timestamp: new Date().toISOString()
                 })
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                const errorText = await response.text();
+                console.error('Raw error response:', errorText);
+                
+                let errorData;
+                try {
+                    errorData = JSON.parse(errorText);
+                } catch (e) {
+                    errorData = { error: errorText || response.statusText || 'Unknown error' };
+                }
+                
                 console.error('AI service error:', errorData);
                 throw new Error(errorData.error || `Failed to analyze image: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            console.log('AI analysis result:', result);
+            const rawResponse = await response.text();
+            console.log('Raw AI response:', rawResponse);
+
+            let result;
+            try {
+                result = JSON.parse(rawResponse);
+            } catch (e) {
+                console.error('Failed to parse AI response:', rawResponse);
+                throw new Error('Invalid JSON response from AI service');
+            }
+
+            console.log('Parsed AI analysis result:', result);
             
             // Validate the response structure
             if (!result.disease || typeof result.confidence !== 'number') {

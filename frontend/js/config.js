@@ -3,9 +3,33 @@ const config = {
     // API Configuration
     api: {
         groq: {
-            endpoint: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/diagnose',
-            apiKey: 'your_groq_api_key_here',
-            model: 'meta-llama/llama-4-scout-17b-16e-instruct'
+            endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+            // Use environment variables from Vite if available
+            apiKey: import.meta.env.VITE_GROQ_API_KEY || 'your_groq_api_key_here',
+            model: 'llama2-70b-4096',  // Updated to LLama 2 model
+            maxRetries: 2,
+            timeout: 30000, // 30 seconds
+            systemPrompt: `You are an expert agricultural AI assistant specializing in crop disease detection.
+                         Your task is to analyze plant images and symptoms to identify diseases with high accuracy.
+                         Always provide structured responses with disease name, confidence level, symptoms, and recommendations.
+                         Base your analysis on visual patterns, reported symptoms, and known disease characteristics.`,
+            // Add response validation
+            validateResponse: (response) => {
+                try {
+                    if (typeof response === 'string') {
+                        response = JSON.parse(response);
+                    }
+                    return response;
+                } catch (error) {
+                    console.error('Failed to parse Groq API response:', error);
+                    throw new Error('Invalid response format from AI service');
+                }
+            }
+        },
+        backend: {
+            baseUrl: import.meta.env.VITE_NODE_ENV === 'production' 
+                ? import.meta.env.VITE_API_URL || 'https://your-production-url.com'
+                : 'http://localhost:3000'
         }
     },
 
@@ -20,14 +44,31 @@ const config = {
     upload: {
         maxSize: 5 * 1024 * 1024, // 5MB
         supportedFormats: ['image/jpeg', 'image/png'],
-        uploadDir: 'uploads/images'
+        maxImages: 5
     },
 
-    // AI Model Settings
+    // AI Analysis Settings
     ai: {
         confidenceThreshold: 0.7,
-        maxRetries: 3,
-        requestTimeout: 30000 // 30 seconds
+        fallbackToColor: true,
+        enhancedAnalysis: true,
+        regionAnalysis: true,
+        responseFormat: {
+            structure: {
+                disease: "string",
+                confidence: "number (0-100)",
+                symptoms: "array of strings",
+                recommendations: "array of strings",
+                details: "string"
+            },
+            example: {
+                disease: "Leaf Blight",
+                confidence: 85,
+                symptoms: ["yellowing leaves", "brown spots", "wilting"],
+                recommendations: ["remove infected leaves", "apply fungicide"],
+                details: "Analysis shows characteristic patterns of Leaf Blight"
+            }
+        }
     },
 
     // Cache Settings
@@ -50,9 +91,9 @@ const config = {
     // Feature Flags
     features: {
         aiDiagnosis: true,
-        weatherIntegration: false,
-        emailNotifications: false,
-        realTimeMonitoring: false
+        multiImageAnalysis: true,
+        symptomTracking: true,
+        treatmentRecommendations: true
     },
 
     // Logging Configuration

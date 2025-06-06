@@ -22,5 +22,7 @@ export default defineConfig({
         main: '/index.html'
       }
     }
-  }
+  },
+  envDir: './frontend',
+  envPrefix: 'VITE_',
 }); 

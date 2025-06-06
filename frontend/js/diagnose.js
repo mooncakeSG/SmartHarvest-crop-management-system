@@ -1,4 +1,5 @@
 import config from './config.js';
+import aiService from './services/aiService.js';
 
 // AI Model Configuration
 const AI_CONFIG = {
@@ -296,29 +297,36 @@ class CropDiagnosis {
         a11y.setLoading(true);
 
         try {
-            const formData = new FormData();
-            // Only send one image as 'image'
-            formData.append('image', this.uploadedImages[0]);
-            formData.append('cropType', cropType);
-            formData.append('plantAge', document.getElementById('plant-age').value);
             // Get selected symptoms
             const symptoms = Array.from(document.querySelectorAll('.symptom-checkbox:checked'))
                 .map(checkbox => checkbox.nextElementSibling.textContent);
-            formData.append('symptoms', JSON.stringify(symptoms));
-            // Add notes
-            formData.append('notes', document.getElementById('notes').value);
 
-            const response = await fetch(config.api.groq.endpoint, {
-                method: 'POST',
-                body: formData
-            });
+            // Process each image
+            const results = await Promise.all(this.uploadedImages.map(async (file) => {
+                try {
+                    // Convert image to base64
+                    const base64Image = await this.fileToBase64(file);
+                    
+                    // Try AI analysis first
+                    try {
+                        const aiResult = await aiService.analyzeCropImage(base64Image, cropType, symptoms);
+                        return aiResult;
+                    } catch (aiError) {
+                        console.warn('AI analysis failed, falling back to color analysis:', aiError);
+                        // Fall back to color analysis
+                        return this.performColorAnalysis(file, cropType, symptoms);
+                    }
+                } catch (error) {
+                    console.error('Image processing error:', error);
+                    throw error;
+                }
+            }));
 
-            if (!response.ok) {
-                throw new Error(`Failed to analyze images: ${response.statusText}`);
-            }
-
-            const results = await response.json();
-            a11y.updateResults(results);
+            // Combine and average results if multiple images
+            const combinedResult = this.combineResults(results);
+            
+            // Update UI with results
+            this.updateResults(combinedResult);
 
         } catch (error) {
             console.error('Diagnosis error:', error);
@@ -327,6 +335,75 @@ class CropDiagnosis {
             this.isAnalyzing = false;
             a11y.setLoading(false);
         }
+    }
+
+    async fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async performColorAnalysis(file, cropType, symptoms) {
+        const formData = new FormData();
+        formData.append('images', file);
+        formData.append('cropType', cropType);
+        formData.append('plantAge', document.getElementById('plant-age').value);
+        formData.append('symptoms', JSON.stringify(symptoms));
+        formData.append('notes', document.getElementById('notes').value);
+
+        const response = await fetch('/api/diagnose', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to analyze images: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    combineResults(results) {
+        if (results.length === 1) return results[0];
+
+        // Combine multiple results
+        const combined = {
+            disease: this.getMostCommonDisease(results),
+            confidence: this.getAverageConfidence(results),
+            symptoms: this.getAllSymptoms(results),
+            recommendations: this.getAllRecommendations(results),
+            analysis_method: results.some(r => r.analysis_method === 'ai') ? 'hybrid' : 'color',
+            details: `Analysis of ${results.length} images completed.`
+        };
+
+        return combined;
+    }
+
+    getMostCommonDisease(results) {
+        const diseases = results.map(r => r.disease);
+        return this.getMostFrequent(diseases);
+    }
+
+    getAverageConfidence(results) {
+        const sum = results.reduce((acc, r) => acc + r.confidence, 0);
+        return Math.round(sum / results.length);
+    }
+
+    getAllSymptoms(results) {
+        return [...new Set(results.flatMap(r => r.symptoms))];
+    }
+
+    getAllRecommendations(results) {
+        return [...new Set(results.flatMap(r => r.recommendations))];
+    }
+
+    getMostFrequent(arr) {
+        return arr.sort((a,b) =>
+            arr.filter(v => v === a).length - arr.filter(v => v === b).length
+        ).pop();
     }
 
     clearForm() {

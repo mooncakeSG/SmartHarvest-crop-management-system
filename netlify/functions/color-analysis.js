@@ -23,29 +23,56 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { cropType, symptomsCount = 0 } = JSON.parse(event.body || '{}');
+    let data;
+    console.log('Content-Type:', event.headers['content-type']);
+    console.log('Request body:', event.body);
 
-    if (!cropType) {
+    // Parse the request body based on content type
+    if (event.headers['content-type']?.includes('application/json')) {
+      data = JSON.parse(event.body);
+    } else {
+      // Assume form data and try to parse it
+      const rawBody = event.body;
+      try {
+        data = JSON.parse(rawBody);
+      } catch (e) {
+        // If JSON parsing fails, try to parse as URLSearchParams
+        const params = new URLSearchParams(rawBody);
+        data = {
+          cropType: params.get('cropType'),
+          symptomsCount: parseInt(params.get('symptomsCount') || '0', 10)
+        };
+      }
+    }
+
+    if (!data || !data.cropType) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Crop type is required' })
+        body: JSON.stringify({ 
+          error: 'Invalid request data',
+          message: 'cropType is required'
+        })
       };
     }
 
-    // Return the color analysis result in the required format
+    console.log('Parsed data:', data);
+
+    // Process the request and return response
+    const result = {
+      result: `Color analysis done for ${data.cropType}.`,
+      confidence: 75,
+      recommendations: [
+        'Prune affected areas',
+        'Improve drainage',
+        'Apply copper-based fungicide'
+      ]
+    };
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
-        result: `Color analysis done for ${cropType}.`,
-        confidence: 75,
-        recommendations: [
-          'Prune affected areas',
-          'Improve drainage',
-          'Apply copper-based fungicide'
-        ]
-      })
+      body: JSON.stringify(result)
     };
   } catch (error) {
     console.error('Color Analysis Error:', error);
@@ -54,7 +81,8 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({ 
         error: 'Internal Server Error',
-        message: error.message
+        message: error.message,
+        details: error.stack
       })
     };
   }

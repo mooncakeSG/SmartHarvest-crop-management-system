@@ -29,7 +29,7 @@ const config = {
         backend: {
             baseUrl: import.meta.env.VITE_NODE_ENV === 'production' 
                 ? (import.meta.env.VITE_API_URL || 'https://smartharvest-crop-management-system.netlify.app')
-                : window.location.origin,
+                : '',
             functions: {
                 aiAnalysis: '/.netlify/functions/ai-analysis',
                 colorAnalysis: '/.netlify/functions/color-analysis'

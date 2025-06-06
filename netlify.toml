@@ -1,16 +1,24 @@
 [build]
 command = "npm run build"
 publish = "dist"
-functions = "netlify/functions"
+functions = "functions-build"
 
 [functions]
+directory = "functions-build"
 node_bundler = "esbuild"
 external_node_modules = ["sharp"]
+
+[dev]
+publish = "dist"
+functions = "netlify/functions"
+framework = "#custom"
+targetPort = 8888
 
 [[redirects]]
 from = "/.netlify/functions/*"
 to = "/.netlify/functions/:splat"
 status = 200
+force = true
 
 [[redirects]]
 from = "/*"

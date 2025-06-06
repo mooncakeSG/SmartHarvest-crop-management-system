@@ -1,5 +1,3 @@
-import { Handler } from '@netlify/functions';
-
 const headers = {
   'Access-Control-Allow-Origin': '*',  // Temporarily allow all origins for testing
   'Access-Control-Allow-Headers': 'Content-Type, Accept',
@@ -7,12 +5,15 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
-export const handler = async (event, context) => {
-  console.log('Color Analysis function called');
-  console.log('Request method:', event.httpMethod);
-  console.log('Request headers:', event.headers);
+exports.handler = async function(event, context) {
+  // Log all incoming request details
+  console.log('Color Analysis function called with:');
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', JSON.stringify(event.headers, null, 2));
+  console.log('Body:', event.body);
+  console.log('Path:', event.path);
 
-  // Handle OPTIONS request for CORS
+  // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -20,6 +21,7 @@ export const handler = async (event, context) => {
     };
   }
 
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -29,43 +31,38 @@ export const handler = async (event, context) => {
   }
 
   try {
-    console.log('Request body:', event.body);
+    // Parse the request body
     let data;
-    
-    // Parse the request body based on content type
-    if (event.headers['content-type']?.includes('application/json')) {
+    try {
       data = JSON.parse(event.body);
-    } else {
-      // Assume form data and try to parse it
-      const rawBody = event.body;
-      try {
-        data = JSON.parse(rawBody);
-      } catch (e) {
-        // If JSON parsing fails, try to parse as URLSearchParams
-        const params = new URLSearchParams(rawBody);
-        data = {
-          cropType: params.get('cropType'),
-          symptomsCount: parseInt(params.get('symptomsCount') || '0', 10)
-        };
-      }
+      console.log('Parsed request data:', data);
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Invalid JSON',
+          details: parseError.message
+        })
+      };
     }
 
+    // Validate required fields
     if (!data || !data.cropType) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
-          error: 'Invalid request data',
+          error: 'Bad Request',
           message: 'cropType is required'
         })
       };
     }
 
-    console.log('Parsed data:', data);
-
     // Process the request and return response
-    const result = {
-      result: `Color analysis done for ${data.cropType}.`,
+    const response = {
+      result: `Color analysis completed for ${data.cropType}.`,
       confidence: 75,
       recommendations: [
         'Prune affected areas',
@@ -74,20 +71,22 @@ export const handler = async (event, context) => {
       ]
     };
 
+    console.log('Sending response:', response);
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(result)
+      body: JSON.stringify(response)
     };
   } catch (error) {
-    console.error('Color Analysis Error:', error);
+    console.error('Function Error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         error: 'Internal Server Error',
         message: error.message,
-        details: error.stack
+        stack: error.stack
       })
     };
   }

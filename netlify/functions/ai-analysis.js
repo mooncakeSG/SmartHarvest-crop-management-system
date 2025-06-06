@@ -1,5 +1,3 @@
-import { Handler } from '@netlify/functions';
-
 const headers = {
   'Access-Control-Allow-Origin': '*',  // Temporarily allow all origins for testing
   'Access-Control-Allow-Headers': 'Content-Type, Accept',
@@ -7,12 +5,15 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
-export const handler = async (event, context) => {
-  console.log('AI Analysis function called');
-  console.log('Request method:', event.httpMethod);
-  console.log('Request headers:', event.headers);
-  
-  // Handle OPTIONS request for CORS
+exports.handler = async function(event, context) {
+  // Log all incoming request details
+  console.log('AI Analysis function called with:');
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', JSON.stringify(event.headers, null, 2));
+  console.log('Body:', event.body);
+  console.log('Path:', event.path);
+
+  // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -20,6 +21,7 @@ export const handler = async (event, context) => {
     };
   }
 
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -29,39 +31,62 @@ export const handler = async (event, context) => {
   }
 
   try {
-    console.log('Request body:', event.body);
-    const { cropType, symptomsCount = 0 } = JSON.parse(event.body || '{}');
-
-    if (!cropType) {
+    // Parse the request body
+    let data;
+    try {
+      data = JSON.parse(event.body);
+      console.log('Parsed request data:', data);
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Crop type is required' })
+        body: JSON.stringify({ 
+          error: 'Invalid JSON',
+          details: parseError.message
+        })
       };
     }
 
-    // Return the diagnosis in the required format
+    // Validate required fields
+    if (!data || !data.cropType) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Bad Request',
+          message: 'cropType is required'
+        })
+      };
+    }
+
+    // Return mock diagnosis
+    const response = {
+      diagnosis: `AI diagnosed ${data.cropType} with ${data.symptomsCount || 0} symptoms.`,
+      confidence: 85,
+      recommendations: [
+        'Remove infected leaves',
+        'Apply appropriate fungicide',
+        'Improve air circulation'
+      ]
+    };
+
+    console.log('Sending response:', response);
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
-        diagnosis: `AI diagnosed ${cropType} with ${symptomsCount} symptoms.`,
-        confidence: 85,
-        recommendations: [
-          'Remove infected leaves',
-          'Apply appropriate fungicide',
-          'Improve air circulation'
-        ]
-      })
+      body: JSON.stringify(response)
     };
   } catch (error) {
-    console.error('AI Analysis Error:', error);
+    console.error('Function Error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         error: 'Internal Server Error',
-        message: error.message
+        message: error.message,
+        stack: error.stack
       })
     };
   }

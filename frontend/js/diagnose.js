@@ -294,14 +294,18 @@ class CropDiagnosis {
             const symptoms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
                 .map(checkbox => checkbox.value);
 
+            console.log('Starting diagnosis:', { cropType, symptomsCount: symptoms.length });
+
             // Convert image to base64
             const imageData = await this.fileToBase64(this.uploadedImages[0]);
 
             try {
-                // Try AI analysis first using AIService instead of aiService
+                // Try AI analysis first
+                console.log('Attempting AI analysis...');
                 const aiResult = await AIService.analyzeCropImage(imageData, cropType, symptoms);
                 
                 if (aiResult && aiResult.disease) {
+                    console.log('AI analysis successful:', aiResult);
                     // Update UI with AI results
                     a11y.updateResults({
                         disease: aiResult.disease,
@@ -316,13 +320,15 @@ class CropDiagnosis {
                 console.error('AI analysis failed:', aiError);
                 // Fall back to color analysis
                 try {
+                    console.log('Attempting color analysis...');
                     const colorResult = await this.performColorAnalysis(this.uploadedImages[0], cropType, symptoms);
                     if (colorResult) {
+                        console.log('Color analysis successful:', colorResult);
                         a11y.updateResults({
-                            disease: colorResult.disease || 'Unknown',
-                            confidence: colorResult.confidence || 0,
-                            recommendations: colorResult.recommendations || [],
-                            symptoms: colorResult.symptoms || [],
+                            disease: colorResult.disease,
+                            confidence: colorResult.confidence,
+                            recommendations: colorResult.recommendations,
+                            symptoms: colorResult.symptoms,
                             details: 'Analysis completed using color analysis due to AI service unavailability.'
                         });
                     } else {
@@ -354,6 +360,9 @@ class CropDiagnosis {
 
     async performColorAnalysis(file, cropType, symptoms) {
         try {
+            const endpoint = `${config.api.backend.baseUrl}${config.api.backend.functions.colorAnalysis}`;
+            console.log('Starting color analysis:', { cropType, symptomsCount: symptoms.length });
+
             const formData = new FormData();
             formData.append('image', file);
             formData.append('cropType', cropType);
@@ -361,17 +370,29 @@ class CropDiagnosis {
             formData.append('symptoms', JSON.stringify(symptoms));
             formData.append('notes', document.getElementById('notes').value || '');
 
-            const response = await fetch(`${config.api.backend.baseUrl}/api/diagnose`, {
+            console.log('Calling color analysis endpoint:', endpoint);
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to analyze images: ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                console.error('Color analysis error:', errorData);
+                throw new Error(errorData.error || `Failed to analyze image: ${response.statusText}`);
             }
 
             const result = await response.json();
-            return result;
+            console.log('Color analysis result:', result);
+
+            // Ensure the response has the required fields
+            return {
+                disease: result.disease || 'Unknown',
+                confidence: result.confidence || 0,
+                recommendations: Array.isArray(result.recommendations) ? result.recommendations : [],
+                symptoms: Array.isArray(result.symptoms) ? result.symptoms : [],
+                analysis_method: 'color'
+            };
         } catch (error) {
             console.error('Color analysis error:', error);
             throw error;

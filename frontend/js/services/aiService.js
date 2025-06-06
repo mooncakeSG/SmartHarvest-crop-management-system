@@ -3,20 +3,29 @@ import config from '../config.js';
 class AIService {
     static async analyzeImage(imageData) {
         try {
-            const response = await fetch(`${config.api.backend.baseUrl}/.netlify/functions/ai-analysis`, {
+            const endpoint = `${config.api.backend.baseUrl}${config.api.backend.functions.aiAnalysis}`;
+            console.log('Calling AI analysis endpoint:', endpoint);
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({ image: imageData })
+                body: JSON.stringify({ 
+                    image: imageData,
+                    model: config.api.groq.model
+                })
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to analyze image');
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                console.error('AI service error:', errorData);
+                throw new Error(errorData.error || `Failed to analyze image: ${response.statusText}`);
             }
 
             const result = await response.json();
+            console.log('AI analysis result:', result);
             
             // Validate the response structure
             if (!result.disease || typeof result.confidence !== 'number') {
@@ -44,7 +53,9 @@ class AIService {
 
     static async analyzeCropImage(imageData, cropType, symptoms = []) {
         try {
+            console.log('Starting crop analysis with:', { cropType, symptomsCount: symptoms.length });
             const result = await this.analyzeImage(imageData);
+            
             return {
                 disease: result.disease,
                 confidence: result.confidence,

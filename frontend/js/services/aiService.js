@@ -3,18 +3,15 @@ import config from '../config.js';
 class AIService {
     static async analyzeImage(imageData) {
         try {
-            // Use the full URL or just the path depending on the environment
-            const endpoint = config.api.backend.baseUrl 
-                ? `${config.api.backend.baseUrl}${config.api.backend.functions.aiAnalysis}`
-                : config.api.backend.functions.aiAnalysis;
-                
+            const endpoint = `${config.api.backend.baseUrl}${config.api.backend.functions.aiAnalysis}`;
             console.log('Calling AI analysis endpoint:', endpoint);
 
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Origin': 'https://smartharvestfrontend.netlify.app'
                 },
                 body: JSON.stringify({ 
                     image: imageData,

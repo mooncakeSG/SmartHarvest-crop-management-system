@@ -360,11 +360,7 @@ class CropDiagnosis {
 
     async performColorAnalysis(file, cropType, symptoms) {
         try {
-            // Use the full URL or just the path depending on the environment
-            const endpoint = config.api.backend.baseUrl 
-                ? `${config.api.backend.baseUrl}${config.api.backend.functions.colorAnalysis}`
-                : config.api.backend.functions.colorAnalysis;
-
+            const endpoint = `${config.api.backend.baseUrl}${config.api.backend.functions.colorAnalysis}`;
             console.log('Starting color analysis:', { cropType, symptomsCount: symptoms.length });
 
             const formData = new FormData();
@@ -378,7 +374,8 @@ class CropDiagnosis {
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Origin': 'https://smartharvestfrontend.netlify.app'
                 },
                 body: formData
             });

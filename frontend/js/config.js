@@ -27,9 +27,7 @@ const config = {
             }
         },
         backend: {
-            baseUrl: import.meta.env.VITE_NODE_ENV === 'production' 
-                ? (import.meta.env.VITE_API_URL || 'https://smartharvest-crop-management-system.netlify.app')
-                : '',
+            baseUrl: 'https://smartharvestbackend.netlify.app',
             functions: {
                 aiAnalysis: '/.netlify/functions/ai-analysis',
                 colorAnalysis: '/.netlify/functions/color-analysis'

@@ -76,3 +76,5 @@ backend/uploads/*
 
 # Generated files
 frontend/css/tailwind.css 
+# Local Netlify folder
+.netlify

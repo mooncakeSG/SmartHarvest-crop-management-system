@@ -1,3 +1,5 @@
+import { Handler } from '@netlify/functions';
+
 const headers = {
   'Access-Control-Allow-Origin': '*',  // Temporarily allow all origins for testing
   'Access-Control-Allow-Headers': 'Content-Type, Accept',
@@ -5,7 +7,7 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
-export const handler = async (event) => {
+export const handler = async (event, context) => {
   console.log('Color Analysis function called');
   console.log('Request method:', event.httpMethod);
   console.log('Request headers:', event.headers);

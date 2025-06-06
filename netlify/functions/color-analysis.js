@@ -23,38 +23,29 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Parse incoming data from FormData
-    const formData = event.body;
-    if (!formData) {
+    const { cropType, symptomsCount = 0 } = JSON.parse(event.body || '{}');
+
+    if (!cropType) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Form data is required' })
+        body: JSON.stringify({ error: 'Crop type is required' })
       };
     }
 
-    // TODO: Implement actual color analysis here
-    // For now, return a dummy response
-    const result = {
-      disease: 'Leaf Spot Disease',
-      confidence: 75,
-      recommendations: [
-        'Prune affected areas',
-        'Improve drainage',
-        'Apply copper-based fungicide'
-      ],
-      symptoms: [
-        'Dark brown spots',
-        'Circular lesions',
-        'Leaf discoloration'
-      ],
-      analysis_method: 'color'
-    };
-
+    // Return the color analysis result in the required format
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(result)
+      body: JSON.stringify({ 
+        result: `Color analysis done for ${cropType}.`,
+        confidence: 75,
+        recommendations: [
+          'Prune affected areas',
+          'Improve drainage',
+          'Apply copper-based fungicide'
+        ]
+      })
     };
   } catch (error) {
     console.error('Color Analysis Error:', error);

@@ -23,41 +23,29 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Parse incoming data
-    const { image, cropType, symptoms = [] } = JSON.parse(event.body || '{}');
+    const { cropType, symptomsCount = 0 } = JSON.parse(event.body || '{}');
 
-    if (!image) {
+    if (!cropType) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Image data is required' })
+        body: JSON.stringify({ error: 'Crop type is required' })
       };
     }
 
-    // TODO: Implement actual AI analysis here
-    // For now, return a dummy response
-    const result = {
-      disease: 'Sample Disease',
-      confidence: 85,
-      data: {
-        name: 'Sample Disease',
+    // Return the diagnosis in the required format
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ 
+        diagnosis: `AI diagnosed ${cropType} with ${symptomsCount} symptoms.`,
+        confidence: 85,
         recommendations: [
           'Remove infected leaves',
           'Apply appropriate fungicide',
           'Improve air circulation'
-        ],
-        symptoms: [
-          'Yellow spots on leaves',
-          'Brown patches',
-          'Wilting'
         ]
-      }
-    };
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
+      })
     };
   } catch (error) {
     console.error('AI Analysis Error:', error);

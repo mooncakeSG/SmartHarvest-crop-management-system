@@ -1,9 +1,11 @@
 [build]
 command = "npm run build"
 publish = "dist"
+functions = "netlify/functions"
 
 [functions]
-directory = "netlify/functions"
+node_bundler = "esbuild"
+external_node_modules = ["sharp"]
 
 [[redirects]]
 from = "/.netlify/functions/*"

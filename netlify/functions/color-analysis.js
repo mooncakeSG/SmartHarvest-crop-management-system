@@ -1,11 +1,15 @@
 const headers = {
-  'Access-Control-Allow-Origin': 'https://smartharvestfrontend.netlify.app',
+  'Access-Control-Allow-Origin': '*',  // Temporarily allow all origins for testing
   'Access-Control-Allow-Headers': 'Content-Type, Accept',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json'
 };
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
+  console.log('Color Analysis function called');
+  console.log('Request method:', event.httpMethod);
+  console.log('Request headers:', event.headers);
+
   // Handle OPTIONS request for CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -23,10 +27,9 @@ exports.handler = async (event) => {
   }
 
   try {
-    let data;
-    console.log('Content-Type:', event.headers['content-type']);
     console.log('Request body:', event.body);
-
+    let data;
+    
     // Parse the request body based on content type
     if (event.headers['content-type']?.includes('application/json')) {
       data = JSON.parse(event.body);

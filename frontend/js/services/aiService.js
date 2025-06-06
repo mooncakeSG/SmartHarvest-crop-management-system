@@ -1,4 +1,4 @@
-import config from '../config';
+import config from '../config.js';
 
 class AIService {
     static async analyzeImage(imageData) {
@@ -42,15 +42,21 @@ class AIService {
         }
     }
 
-    // Add compatibility method for existing code
     static async analyzeCropImage(imageData, cropType, symptoms = []) {
         try {
             const result = await this.analyzeImage(imageData);
             return {
-                ...result,
+                disease: result.disease,
+                confidence: result.confidence,
                 cropType,
                 reportedSymptoms: symptoms,
-                analysis_method: 'ai'
+                analysis_method: 'ai',
+                data: {
+                    name: result.disease,
+                    recommendations: result.data.recommendations,
+                    symptoms: result.data.symptoms,
+                    confidence_threshold: config.ai.confidenceThreshold
+                }
             };
         } catch (error) {
             console.error('Crop Analysis Error:', error);

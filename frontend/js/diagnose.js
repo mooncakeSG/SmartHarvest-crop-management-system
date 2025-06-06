@@ -1,5 +1,5 @@
 import config from './config.js';
-import aiService from './services/aiService.js';
+import AIService from './services/aiService.js';
 
 // AI Model Configuration
 const AI_CONFIG = {
@@ -298,16 +298,16 @@ class CropDiagnosis {
             const imageData = await this.fileToBase64(this.uploadedImages[0]);
 
             try {
-                // Try AI analysis first
-                const aiResult = await aiService.analyzeCropImage(imageData, cropType, symptoms);
+                // Try AI analysis first using AIService instead of aiService
+                const aiResult = await AIService.analyzeCropImage(imageData, cropType, symptoms);
                 
                 if (aiResult && aiResult.disease) {
                     // Update UI with AI results
                     a11y.updateResults({
                         disease: aiResult.disease,
                         confidence: aiResult.confidence,
-                        recommendations: aiResult.data.recommendations,
-                        symptoms: aiResult.data.symptoms,
+                        recommendations: aiResult.data.recommendations || [],
+                        symptoms: aiResult.data.symptoms || [],
                         details: `Analysis completed using AI. Detected ${aiResult.disease} with ${aiResult.confidence}% confidence.`
                     });
                     return;
@@ -315,14 +315,23 @@ class CropDiagnosis {
             } catch (aiError) {
                 console.error('AI analysis failed:', aiError);
                 // Fall back to color analysis
-                const colorResult = await this.performColorAnalysis(this.uploadedImages[0], cropType, symptoms);
-                a11y.updateResults({
-                    disease: colorResult.disease,
-                    confidence: colorResult.confidence,
-                    recommendations: colorResult.recommendations,
-                    symptoms: colorResult.symptoms,
-                    details: 'Analysis completed using color analysis due to AI service unavailability.'
-                });
+                try {
+                    const colorResult = await this.performColorAnalysis(this.uploadedImages[0], cropType, symptoms);
+                    if (colorResult) {
+                        a11y.updateResults({
+                            disease: colorResult.disease || 'Unknown',
+                            confidence: colorResult.confidence || 0,
+                            recommendations: colorResult.recommendations || [],
+                            symptoms: colorResult.symptoms || [],
+                            details: 'Analysis completed using color analysis due to AI service unavailability.'
+                        });
+                    } else {
+                        throw new Error('Color analysis returned no results');
+                    }
+                } catch (colorError) {
+                    console.error('Color analysis failed:', colorError);
+                    throw new Error('Both AI and color analysis failed. Please try again.');
+                }
             }
 
         } catch (error) {
@@ -344,23 +353,29 @@ class CropDiagnosis {
     }
 
     async performColorAnalysis(file, cropType, symptoms) {
-        const formData = new FormData();
-        formData.append('images', file);
-        formData.append('cropType', cropType);
-        formData.append('plantAge', document.getElementById('plant-age').value);
-        formData.append('symptoms', JSON.stringify(symptoms));
-        formData.append('notes', document.getElementById('notes').value);
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('cropType', cropType);
+            formData.append('plantAge', document.getElementById('plant-age').value || '');
+            formData.append('symptoms', JSON.stringify(symptoms));
+            formData.append('notes', document.getElementById('notes').value || '');
 
-        const response = await fetch('/api/diagnose', {
-            method: 'POST',
-            body: formData
-        });
+            const response = await fetch(`${config.api.backend.baseUrl}/api/diagnose`, {
+                method: 'POST',
+                body: formData
+            });
 
-        if (!response.ok) {
-            throw new Error(`Failed to analyze images: ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Failed to analyze images: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Color analysis error:', error);
+            throw error;
         }
-
-        return await response.json();
     }
 
     clearForm() {
